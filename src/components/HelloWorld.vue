@@ -59,17 +59,19 @@ export default {
           this.htmls = []
           this.datalen = res.data.length
       }
-       res.data.sort().forEach(element => {
-         axios.get('/wechat-page/'+element).then(resx => {
+
+      for (let index = 0; index < res.data.length; index++) {
+        const element = res.data[index];
+        axios.get('/wechat-page/'+element).then(resx => {
            this.htmls.push({title:element.replace(".html",""),html:resx.data.replace(/<p><br\s\s\/><\/p>/g,'').replace(/<p><span style="font-size: \d\dpx;"><br\s\s\/><\/span><\/p>/g,'').replace(/<p style=""><br\s\s\/><\/p>/g,'')})
            if(this.datalen === this.htmls.length){
              this.htmls = this.htmls.sort((a, b) => a.title - b.title)
              setTimeout(() => {
              this.removeDefTitle()
-           },0)
+           },1)
            }
-         })
-       });
+         }) 
+      }
     })
   },
   methods:{
