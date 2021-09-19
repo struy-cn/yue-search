@@ -1,5 +1,4 @@
 git checkout gh-pages
-git pull
 git merge master
 yarn fetch && yarn build
 git add -f dist
