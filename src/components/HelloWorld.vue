@@ -24,6 +24,7 @@
     width="50%"
     :before-close="handleClose">
     <span>{{dialogMsg}}</span>
+    <p><img alt="Yue QR" src="qrcode.bmp"></p>
     <p ><a target="_blank" :href="bLink">前往B站查看</a></p>
     <p ><a target="_blank" :href="xLink">前往西瓜视频查看</a></p>
     <p ><a target="_blank" :href="yLink">前往Youtube查看</a></p>
@@ -31,8 +32,8 @@
       <el-button type="primary" @click="dialogVisible = false">好的</el-button>
     </span> -->
   </el-dialog>
-    <el-divider >about</el-divider>
-    <el-footer>本项目仅供学习使用，请勿用于其他商业用途！！！</el-footer>
+    <el-divider >about project</el-divider>
+    <el-footer>© 2021 <a target="_blank" href="git66.com">struy</a>｜本项目仅供学习使用，请勿用于商业用途！</el-footer>
   </div>
 </template>
 
