@@ -54,7 +54,7 @@ export default {
     }
   },
   created(){
-    axios.get('/wechat-page/').then(res => {
+    axios.get('/db/data.json').then(res => {
       if(res.data.length > 0){
           this.htmls = []
           this.datalen = res.data.length
