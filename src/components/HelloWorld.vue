@@ -5,12 +5,12 @@
      (来源:微信公众号)
     </p>
     <div style="margin-top: 15px;padding: 15px;">
-    <el-input placeholder="请输入内容" v-model="searchKeyword" @change="searchDoms" class="input-with-select">
+    <el-input placeholder="输入电影名" v-model="searchKeyword" @change="searchDoms" class="input-with-select">
       <el-select v-model="select" slot="prepend" placeholder="请选择" style="width:100px;">
         <el-option label="公众号" :value="1" ></el-option>
-        <el-option label="B站" :value="2"></el-option>
-        <el-option label="Youtube" :value="3"></el-option>
-        <el-option label="西瓜视频" :value="4"></el-option>
+        <el-option disabled label="B站" :value="2"></el-option>
+        <el-option disabled label="Youtube" :value="3"></el-option>
+        <el-option disabled label="西瓜视频" :value="4"></el-option>
       </el-select>
       <el-button slot="append" icon="el-icon-search" @click="searchDoms"></el-button>
     </el-input>
@@ -21,12 +21,15 @@
     <el-dialog
     title="提示"
     :visible.sync="dialogVisible"
-    width="30%"
+    width="50%"
     :before-close="handleClose">
     <span>{{dialogMsg}}</span>
-    <span slot="footer" class="dialog-footer">
+    <p ><a target="_blank" :href="bLink">前往B站查看</a></p>
+    <p ><a target="_blank" :href="xLink">前往西瓜视频查看</a></p>
+    <p ><a target="_blank" :href="yLink">前往Youtube查看</a></p>
+    <!-- <span slot="footer" class="dialog-footer">
       <el-button type="primary" @click="dialogVisible = false">好的</el-button>
-    </span>
+    </span> -->
   </el-dialog>
     <el-divider >about</el-divider>
     <el-footer>本项目仅供学习使用，请勿用于其他商业用途！！！</el-footer>
@@ -50,7 +53,10 @@ export default {
       select:1,
       searchKeyword:'',
       dialogMsg:"",
-      dialogVisible:false
+      dialogVisible:false,
+      bLink: '',
+      xLink:'',
+      yLink:''
     }
   },
   created(){
@@ -86,12 +92,15 @@ export default {
       this.dialogMsg = msg
     },
     handleClose(){
-
+      this.dialogVisible = false
     },
     searchDoms(){
       let doms = document.querySelectorAll('a[textvalue*="'+this.searchKeyword+'"]')
+      this.bLink = 'https://space.bilibili.com/149558293/search/video?keyword='+this.searchKeyword
+      this.xLink = 'https://www.ixigua.com/search/越哥说电影'+this.searchKeyword
+      this.yLink = 'https://www.youtube.com/channel/UChgCVolsF6L7DWmOpWKSkMA/search?query='+this.searchKeyword
       if(doms.length === 0){
-        this.showMsg('没有找到《'+this.searchKeyword+'》的解说，赶紧让越哥解说😂')
+        this.showMsg('没有找到《'+this.searchKeyword+'》的解说，赶紧让越哥解说😂,或者去下面找找')
       }
       doms.forEach(x => {
         x.classList.add('search')
