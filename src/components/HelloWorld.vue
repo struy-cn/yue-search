@@ -1,6 +1,7 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
+    <p>越哥说电影，专注好电影！</p>
     <p>
      (来源:微信公众号)
     </p>
@@ -24,6 +25,7 @@
     width="50%"
     :before-close="handleClose">
     <span>{{dialogMsg}}</span>
+    <p><span>扫码去微信公众号查看</span></p>
     <p><img alt="Yue QR" src="qrcode.bmp"></p>
     <p ><a target="_blank" :href="bLink">前往B站查看</a></p>
     <p ><a target="_blank" :href="xLink">前往西瓜视频查看</a></p>
@@ -33,7 +35,7 @@
     </span> -->
   </el-dialog>
     <el-divider >about project</el-divider>
-    <el-footer>© 2021 <a target="_blank" href="git66.com">struy</a>｜本项目仅供学习使用，请勿用于商业用途！</el-footer>
+    <el-footer>© 2021 <a target="_blank" href="git66.com">struy</a>｜<a target="_blank" href="https://github.com/StruggleYang/yue-search">源代码</a>｜本项目仅供学习使用，请勿用于商业用途！</el-footer>
   </div>
 </template>
 
