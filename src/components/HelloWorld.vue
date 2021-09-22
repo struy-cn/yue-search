@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div class="hello" :style="isMobile?'margin-top: 60px;':''">
     <h1>{{ msg }}</h1>
     <p>越哥说电影，专注好电影！</p>
     <p>
@@ -143,7 +143,7 @@ a {
 }
 .search-input-mobile{
   position: fixed;
-  bottom: 0;
+  top: 0;
   left: 0;
   right: 0;
   z-index: 999;
