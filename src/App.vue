@@ -2,7 +2,9 @@
   <div id="app">
     <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
     <HelloWorld msg="越哥说电影解说合集"/>
-    <el-backtop target="body" :visibility-height="100"></el-backtop>
+    <a class="go-top" href="javascript:void(0)" @click="goTop">
+      <i class="el-icon-top" aria-hidden="true"></i>
+    </a>
   </div>
 </template>
 
@@ -13,6 +15,14 @@ export default {
   name: 'App',
   components: {
     HelloWorld
+  },
+  methods:{
+    goTop(){
+      let ds = document.getElementsByTagName('body','html')
+      ds.forEach(x => {
+        x.scrollIntoView({'behavior':'smooth'})
+      })
+    }
   }
 }
 </script>
@@ -27,5 +37,26 @@ export default {
   width: 100%;
   height: 100%;
   overflow-y: scroll;
+}
+.go-top {
+    text-align: center;
+    padding: 15px 5px;
+    position: fixed;
+    z-index: 999;
+    right: 30px;
+    bottom: 60px;
+    border: 1px solid #DDD;
+    display: block;
+    width: 16px;
+    background: #fff;
+    line-height: 100%;
+    color: #DDD;
+    /* display: none; */
+}
+
+.go-top:hover,
+.go-top:focus {
+    color: #918e8e;
+    text-decoration: none;
 }
 </style>

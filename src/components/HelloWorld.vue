@@ -5,7 +5,8 @@
     <p>
      (来源:微信公众号)
     </p>
-    <div style="margin-top: 15px;padding: 15px;">
+    <el-divider v-if="isMobile" ></el-divider>
+    <div :class="isMobile?'search-input-mobile':'search-input'">
     <el-input placeholder="输入电影名" v-model="searchKeyword" @change="searchDoms" class="input-with-select">
       <el-select disabled v-model="select" slot="prepend" placeholder="请选择" style="width:100px;">
         <el-option label="公众号" :value="1" ></el-option>
@@ -35,7 +36,7 @@
     </span> -->
   </el-dialog>
     <el-divider >about project</el-divider>
-    <el-footer>© 2021 <a target="_blank" href="http://git66.com/soul">struy</a>｜<a target="_blank" href="https://github.com/StruggleYang/yue-search">源代码</a>｜本项目仅供学习使用，请勿用于商业用途！</el-footer>
+    <el-footer :style="isMobile?'margin-bottom: 40px;':''">© 2021 <a target="_blank" href="http://git66.com/soul">struy</a>｜<a target="_blank" href="https://github.com/StruggleYang/yue-search">源代码</a>｜本项目仅供学习使用，请勿用于商业用途！</el-footer>
   </div>
 </template>
 
@@ -59,7 +60,8 @@ export default {
       dialogVisible:false,
       bLink: '',
       xLink:'',
-      yLink:''
+      yLink:'',
+      isMobile:false
     }
   },
   created(){
@@ -82,6 +84,7 @@ export default {
          }) 
       }
     })
+    this.isMobile = this._isMobile()
   },
   methods:{
     removeDefTitle(){
@@ -96,6 +99,11 @@ export default {
     },
     handleClose(){
       this.dialogVisible = false
+    },
+     _isMobile() {
+       console.log(navigator.userAgent)
+      let flag = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)
+      return flag;
     },
     searchDoms(){
       let doms = document.querySelectorAll('a[textvalue*="'+this.searchKeyword+'"]')
@@ -121,9 +129,20 @@ a {
   color: #037b45;
 }
 .el-select{
-    width: 200px;
+    width: 150px;
   }
 .search{
   color: red !important;
+}
+.search-input {
+    margin-top: 15px;
+    padding: 15px;
+}
+.search-input-mobile{
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
 }
 </style>
