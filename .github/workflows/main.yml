@@ -7,8 +7,6 @@ on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron:  '0 */5 * * *'
@@ -27,17 +25,12 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
       - name: Build pages
         run: |
+          git config --global user.email "1724555319@qq.com"
+          git config --global user.name "StruggleYang"
           yarn deploy
-          
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
