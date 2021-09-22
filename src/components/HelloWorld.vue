@@ -5,6 +5,11 @@
     <p>
      (来源:微信公众号)
     </p>
+    <p>
+      <a title="试试手气" href="javascript:void(0)" @click="randomOpen"><i class="el-icon-present"></i></a>
+      <el-divider direction="vertical"></el-divider>
+      <a title="宋词" href="javascript:void(0)" @click="songCi"><i class="el-icon-reading"></i></a>
+    </p>
     <el-divider v-if="isMobile" ></el-divider>
     <div :class="isMobile?'search-input-mobile':'search-input'">
     <el-input ref="keywordInput" placeholder="输入电影名" v-model="searchKeyword" @change="searchDoms" class="input-with-select">
@@ -21,19 +26,33 @@
       <el-col v-for="(item,index) in htmls" :key="index" :xs="24" :sm="6" :md="6" :lg="6" :xl="6"><p>{{item.title}}年解说合集</p><div class="grid-content bg-purple-dark" v-html="item.html"></div></el-col>
     </el-row>
     <el-dialog
-      title="提示"
+      :title="dialogTitle"
       :visible.sync="dialogVisible"
-      :width="isMobile?'80%':'50%'"
+      :width="isMobile?'85%':'50%'"
       :before-close="handleClose">
       <span>{{dialogMsg}}</span>
-      <p><span>扫码去微信公众号查看</span></p>
-      <p><img alt="Yue QR" src="qrcode.bmp"></p>
-      <p ><a target="_blank" :href="bLink">前往B站查看</a></p>
-      <p ><a target="_blank" :href="xLink">前往西瓜视频查看</a></p>
-      <p ><a target="_blank" :href="yLink">前往Youtube查看</a></p>
-      <!-- <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogVisible = false">好的</el-button>
-      </span> -->
+      <div v-if="randomMovie === null && currentCi === null">
+        <p><span>扫码去微信公众号查看</span></p>
+        <p><img alt="Yue QR" src="qrcode.bmp"></p>
+        <p ><a target="_blank" :href="bLink">前往B站查看</a></p>
+        <p ><a target="_blank" :href="xLink">前往西瓜视频查看</a></p>
+        <p ><a target="_blank" :href="yLink">前往Youtube查看</a></p>
+      </div>
+      <div v-else-if="randomMovie !== null && currentCi === null">
+        <p>摇到一个超棒的解说，去看看吧</p>
+        <p>🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉</p>
+        <p><a :href="randomMovie.href">{{ randomMovie.title }}</a></p>
+        <p>🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉</p>
+      </div>
+      <div v-else-if="randomMovie === null && currentCi !== null">
+        <p>
+          <span>作者：{{ currentCi.author}}</span>
+          <el-divider direction="vertical"></el-divider>
+          <el-tag v-for=" tag in currentCi.tags" :key="tag" size="mini">{{tag}}</el-tag>
+        </p>
+        <el-divider ></el-divider>
+        <p v-for="row in currentCi.paragraphs" :key="row">{{row}}</p>
+      </div>
     </el-dialog>
     <el-divider >about project</el-divider>
     <el-footer :style="isMobile?'margin-bottom: 40px;':''">© 2021 <a target="_blank" href="http://git66.com/soul">struy</a>｜<a target="_blank" href="https://github.com/StruggleYang/yue-search">源代码</a>｜本项目仅供学习使用，请勿用于商业用途！</el-footer>
@@ -58,10 +77,14 @@ export default {
       searchKeyword:'',
       dialogMsg:"",
       dialogVisible:false,
+      dialogTitle:'提示',
       bLink: '',
       xLink:'',
       yLink:'',
-      isMobile:false
+      isMobile:false,
+      randomMovie: null,
+      songci:[],
+      currentCi:null
     }
   },
   created(){
@@ -88,6 +111,9 @@ export default {
     this.$nextTick(() => {
       this.$refs.keywordInput.focus()
     })
+    axios.get('/db/songci300.json').then(res => {
+      this.songci = res.data
+    })
   },
   methods:{
     removeDefTitle(){
@@ -102,11 +128,29 @@ export default {
     },
     handleClose(){
       this.dialogVisible = false
+      this.randomMovie = null
+      this.currentCi = null
+      this.dialogMsg = ""
+      this.dialogTitle = '提示'
     },
      _isMobile() {
        console.log(navigator.userAgent)
       let flag = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)
       return flag;
+    },
+    randomOpen(){
+      const movies = document.querySelectorAll('.grid-content  a')
+      const num = Math.floor(Math.random() * (movies.length))
+      let dom = movies[num]
+      this.randomMovie = {title:dom.text.replace(/\d{1,3}、/,''),href:dom.href}
+      this.dialogTitle = '手气不错'
+      this.dialogVisible = true
+    },
+    songCi(){
+      const num = Math.floor(Math.random() * (this.songci.length))
+      this.currentCi = this.songci[num]
+      this.dialogTitle = '《'+this.currentCi.rhythmic+'》'
+      this.dialogVisible = true
     },
     searchDoms(){
       let doms = document.querySelectorAll('a[textvalue*="'+this.searchKeyword+'"]')
