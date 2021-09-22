@@ -7,8 +7,8 @@
     </p>
     <el-divider v-if="isMobile" ></el-divider>
     <div :class="isMobile?'search-input-mobile':'search-input'">
-    <el-input placeholder="输入电影名" v-model="searchKeyword" @change="searchDoms" class="input-with-select">
-      <el-select disabled v-model="select" slot="prepend" placeholder="请选择" style="width:100px;">
+    <el-input ref="keywordInput" placeholder="输入电影名" v-model="searchKeyword" @change="searchDoms" class="input-with-select">
+      <el-select v-if="!isMobile" disabled v-model="select" slot="prepend" placeholder="请选择" style="width:100px;">
         <el-option label="公众号" :value="1" ></el-option>
         <el-option disabled label="B站" :value="2"></el-option>
         <el-option disabled label="Youtube" :value="3"></el-option>
@@ -21,20 +21,20 @@
       <el-col v-for="(item,index) in htmls" :key="index" :xs="24" :sm="6" :md="6" :lg="6" :xl="6"><p>{{item.title}}年解说合集</p><div class="grid-content bg-purple-dark" v-html="item.html"></div></el-col>
     </el-row>
     <el-dialog
-    title="提示"
-    :visible.sync="dialogVisible"
-    width="50%"
-    :before-close="handleClose">
-    <span>{{dialogMsg}}</span>
-    <p><span>扫码去微信公众号查看</span></p>
-    <p><img alt="Yue QR" src="qrcode.bmp"></p>
-    <p ><a target="_blank" :href="bLink">前往B站查看</a></p>
-    <p ><a target="_blank" :href="xLink">前往西瓜视频查看</a></p>
-    <p ><a target="_blank" :href="yLink">前往Youtube查看</a></p>
-    <!-- <span slot="footer" class="dialog-footer">
-      <el-button type="primary" @click="dialogVisible = false">好的</el-button>
-    </span> -->
-  </el-dialog>
+      title="提示"
+      :visible.sync="dialogVisible"
+      :width="isMobile?'80%':'50%'"
+      :before-close="handleClose">
+      <span>{{dialogMsg}}</span>
+      <p><span>扫码去微信公众号查看</span></p>
+      <p><img alt="Yue QR" src="qrcode.bmp"></p>
+      <p ><a target="_blank" :href="bLink">前往B站查看</a></p>
+      <p ><a target="_blank" :href="xLink">前往西瓜视频查看</a></p>
+      <p ><a target="_blank" :href="yLink">前往Youtube查看</a></p>
+      <!-- <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogVisible = false">好的</el-button>
+      </span> -->
+    </el-dialog>
     <el-divider >about project</el-divider>
     <el-footer :style="isMobile?'margin-bottom: 40px;':''">© 2021 <a target="_blank" href="http://git66.com/soul">struy</a>｜<a target="_blank" href="https://github.com/StruggleYang/yue-search">源代码</a>｜本项目仅供学习使用，请勿用于商业用途！</el-footer>
   </div>
@@ -85,6 +85,9 @@ export default {
       }
     })
     this.isMobile = this._isMobile()
+    this.$nextTick(() => {
+      this.$refs.keywordInput.focus()
+    })
   },
   methods:{
     removeDefTitle(){
