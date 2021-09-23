@@ -12,7 +12,7 @@
     </p>
     <el-divider v-if="isMobile" ></el-divider>
     <div :class="isMobile?'search-input-mobile':'search-input'">
-    <el-input ref="keywordInput" placeholder="输入电影名" v-model="searchKeyword" @change="searchDoms" class="input-with-select">
+    <el-input ref="keywordInput" :autofocus="true" placeholder="输入电影名" v-model="searchKeyword" @change="searchDoms" class="input-with-select">
       <el-select v-if="!isMobile" disabled v-model="select" slot="prepend" placeholder="请选择" style="width:100px;">
         <el-option label="公众号" :value="1" ></el-option>
         <el-option disabled label="B站" :value="2"></el-option>
@@ -27,11 +27,13 @@
     </el-row>
     <el-dialog
       :title="dialogTitle"
-      :visible.sync="dialogVisible"
+      :visible="dialogVisible"
+      :destroy-on-close="true"
       :width="isMobile?'85%':'50%'"
-      :before-close="handleClose">
+      @close="handleClose"
+      @closed="handleClosed">
       <span>{{dialogMsg}}</span>
-      <div v-if="randomMovie === null && currentCi === null">
+      <div v-if="randomMovie === null && currentCi === null && dialogVisible">
         <p><span>扫码去微信公众号查看</span></p>
         <p><img alt="Yue QR" src="qrcode.bmp"></p>
         <p ><a target="_blank" :href="bLink">前往B站查看</a></p>
@@ -128,6 +130,8 @@ export default {
     },
     handleClose(){
       this.dialogVisible = false
+    },
+    handleClosed(){
       this.randomMovie = null
       this.currentCi = null
       this.dialogMsg = ""
@@ -180,6 +184,9 @@ a {
   }
 .search{
   color: red !important;
+}
+.input-with-select .el-input__inner{
+  border-radius: 0;
 }
 .search-input {
     margin-top: 15px;
