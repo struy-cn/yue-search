@@ -9,6 +9,8 @@
       <a title="试试手气" href="javascript:void(0)" @click="randomOpen"><i class="el-icon-present"></i></a>
       <el-divider direction="vertical"></el-divider>
       <a title="宋词" href="javascript:void(0)" @click="songCi"><i class="el-icon-reading"></i></a>
+      <el-divider direction="vertical"></el-divider>
+      <a title="音乐" href="javascript:void(0)" @click="music"><i class="el-icon-moon"></i></a>
     </p>
     <el-divider v-if="isMobile" ></el-divider>
     <div :class="isMobile?'search-input-mobile':'search-input'">
@@ -43,8 +45,17 @@
       <div v-else-if="randomMovie !== null && currentCi === null">
         <p>摇到一个超棒的解说，去看看吧</p>
         <p>🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉</p>
-        <p><a :href="randomMovie.href">{{ randomMovie.title }}</a></p>
-        <p>🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉</p>
+        <p><a :href="randomMovie.href">{{ randomMovie.title.replace(/\d{1,3}、/,'') }}</a></p>
+        <el-divider ></el-divider>
+        <p>{{ randomMovie.linkContent.title }}</p>
+        <blockquote>{{ randomMovie.linkContent.desc }}</blockquote>
+        <!-- 图片暂时不能引用 -->
+        <!-- <el-image
+          style="width: 100px; height: 100px"
+          :src="randomMovie.linkContent.cdn_url"
+          :fit="fit"></el-image> -->
+        <el-divider ></el-divider>
+        <div v-html="randomMovie.linkContent.content_noencode.replace(/<section.*?section>/g,'').replace(/<iframe.*?iframe>/g,'').replace(/<img.*?>/g,'').replace('高清播放地址','')"></div>
       </div>
       <div v-else-if="randomMovie === null && currentCi !== null">
         <p>
@@ -86,7 +97,8 @@ export default {
       isMobile:false,
       randomMovie: null,
       songci:[],
-      currentCi:null
+      currentCi:null,
+      allMovies:[]
     }
   },
   created(){
@@ -106,7 +118,11 @@ export default {
              this.removeDefTitle()
            },1)
            }
-         }) 
+         })
+         axios.get('/db/'+element.replace(".html",".json")).then(resy => {
+           console.log(resy.data)
+           this.allMovies = this.allMovies.concat(resy.data)
+         })
       }
     })
     this.isMobile = this._isMobile()
@@ -143,10 +159,9 @@ export default {
       return flag;
     },
     randomOpen(){
-      const movies = document.querySelectorAll('.grid-content  a')
-      const num = Math.floor(Math.random() * (movies.length))
-      let dom = movies[num]
-      this.randomMovie = {title:dom.text.replace(/\d{1,3}、/,''),href:dom.href}
+      //const movies = document.querySelectorAll('.grid-content  a')
+      const num = Number(Math.floor(Math.random() * (this.allMovies.length)))
+      this.randomMovie = this.allMovies[num]
       this.dialogTitle = '手气不错'
       this.dialogVisible = true
     },
@@ -155,6 +170,9 @@ export default {
       this.currentCi = this.songci[num]
       this.dialogTitle = '《'+this.currentCi.rhythmic+'》'
       this.dialogVisible = true
+    },
+    music(){
+
     },
     searchDoms(){
       let doms = document.querySelectorAll('a[textvalue*="'+this.searchKeyword+'"]')

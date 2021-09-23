@@ -11,3 +11,5 @@ done
 datas=$(cat public/db/data.json)
 echo ${datas%?} > public/db/data.json
 echo ']' >>public/db/data.json
+
+python3 dataDetail.py
