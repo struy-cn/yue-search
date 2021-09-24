@@ -33,12 +33,18 @@
       </el-col>
     </el-row>
     <el-dialog
-      :title="dialogTitle"
       :visible="dialogVisible"
       :destroy-on-close="true"
-      :width="isMobile?'85%':'50%'"
+      :width="isMobile?'90%':'50%'"
       @close="handleClose"
       @closed="handleClosed">
+      <span slot="title">{{dialogTitle}}
+        <el-divider direction="vertical"></el-divider>
+        <a v-if="randomMovie !== null && currentCi === null"
+         title="img" href="javascript:void(0)" @click="shareImg('#movie-body',randomMovie.href)"><i class="el-icon-share"></i></a>
+         <a v-if="randomMovie === null && currentCi !== null"
+         title="img" href="javascript:void(0)" @click="shareImg('#songci-body')"><i class="el-icon-share"></i></a>
+      </span>
       <span>{{dialogMsg}}</span>
       <div v-if="randomMovie === null && currentCi === null && dialogVisible && searchKeyword && !isMuics">
         <p><span>扫码去微信公众号查看</span></p>
@@ -50,19 +56,38 @@
       <div v-else-if="randomMovie !== null && currentCi === null">
         <p>找到一个超棒的解说，去看看吧</p>
         <p>🎉🎉🎉🎉🎉🎉(点此去观看)🎉🎉🎉🎉🎉🎉</p>
-        <p><a :href="randomMovie.href">{{ randomMovie.title.replace(/\d{1,3}、/,'') }}</a></p>
-        <el-divider ></el-divider>
-        <p>{{ randomMovie.linkContent.title }}</p>
-        <blockquote>{{ randomMovie.linkContent.desc }}</blockquote>
-        <!-- 图片暂时不能引用 -->
-        <el-image
-          :src="genImgUrl(randomMovie.title)"
-          fit="cover"> 
-        </el-image>
-        <el-divider ></el-divider>
-        <div v-html="randomMovie.linkContent.content_noencode.replace(/<section.*?section>/g,'').replace(/<iframe.*?iframe>/g,'').replace(/<img.*?>/g,'').replace('高清播放地址','')"></div>
+        <div id="movie-body" >
+          <br>
+          <p><a :href="randomMovie.href">{{ randomMovie.title.replace(/\d{1,3}、/,'') }}</a></p>
+          <el-divider ></el-divider>
+          <p>{{ randomMovie.linkContent.title }}</p>
+          <blockquote>{{ randomMovie.linkContent.desc }}</blockquote>
+          <el-image
+            :src="genImgUrl(randomMovie.title)"
+            fit="cover"> 
+          </el-image>
+          <el-divider ></el-divider>
+          <div v-html="handerContentNoencode(randomMovie.linkContent.content_noencode)"></div>
+          <br>
+          <div v-if="innerVisible">
+            <el-divider ></el-divider>
+            <p>扫码观看当前解说(直达)</p>
+            <p id="qrcode"></p>
+            <el-footer style="background-color:#fafafa;line-height: 60px;">
+              <span>
+                <span>via 越哥说电影合集</span>
+                <el-divider direction="vertical"></el-divider>
+                <span>yue.git66.com</span>
+              </span>
+            </el-footer>
+          </div>
+        </div>
       </div>
-      <div v-else-if="randomMovie === null && currentCi !== null">
+      <div id="songci-body" v-else-if="randomMovie === null && currentCi !== null">
+        <p v-if="innerVisible" style="text-align: center;">
+          <br>
+          {{'《'+currentCi.rhythmic+'》'}}
+        </p>
         <p>
           <span>作者：{{ currentCi.author}}</span>
           <el-divider direction="vertical"></el-divider>
@@ -70,6 +95,15 @@
         </p>
         <el-divider ></el-divider>
         <p v-for="row in currentCi.paragraphs" :key="row">{{row}}</p>
+        <div v-if="innerVisible">
+            <el-footer style="background-color:#fafafa;line-height: 60px;">
+              <span>
+                <span>via 越哥说电影合集</span>
+                <el-divider direction="vertical"></el-divider>
+                <span>yue.git66.com</span>
+              </span>
+            </el-footer>
+          </div>
       </div>
       <div v-if="isMuics">
         <p>
@@ -78,6 +112,17 @@
         </p>
         <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=320 src="//music.163.com/outchain/player?type=0&id=6985955562&auto=1&height=430"></iframe>
       </div>
+      <el-dialog
+          top="10px"
+          :destroy-on-close="true"
+          :width="isMobile?'90%':'50%'"
+          @close="handleCloseInner"
+          :visible="innerVisible"
+          append-to-body>
+          <p style="text-align: center;">{{innerVisibleMsg}}</p>
+          <div id="inner-body-img-box" style="box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)">
+          </div>
+        </el-dialog>
     </el-dialog>
     <el-divider >about project</el-divider>
     <el-footer :style="isMobile?'margin-bottom: 40px;':''">© 2021 <a target="_blank" href="http://git66.com/soul">struy</a>｜<a target="_blank" href="https://github.com/StruggleYang/yue-search">源代码</a>｜本项目仅供学习使用，请勿用于商业用途！</el-footer>
@@ -87,6 +132,8 @@
 <script>
 import axios from "axios";
 import md5 from "js-md5";
+import html2canvas from 'html2canvas';
+import QRCode  from "qrcodejs2"
 
 export default {
   name: 'HelloWorld',
@@ -113,7 +160,9 @@ export default {
       isMuics:false,
       currentCi:null,
       allMovies:[],
-      loading:true
+      loading:true,
+      innerVisible:false,
+      innerVisibleMsg:''
     }
   },
   created(){
@@ -129,9 +178,6 @@ export default {
            this.htmls.push({title:element.replace(".html",""),html:resx.data.replace(/<p><br\s\s\/><\/p>/g,'').replace(/<p><span style="font-size: \d\dpx;"><br\s\s\/><\/span><\/p>/g,'').replace(/<p style=""><br\s\s\/><\/p>/g,'')})
            if(this.datalen === this.htmls.length){
              this.htmls = this.htmls.sort((a, b) => a.title - b.title)
-          //    setTimeout(() => {
-          //    this.removeDefTitle()
-          //  },1)
            }
          })
          axios.get('/db/'+element.replace(".html",".json")).then(resy => {
@@ -168,6 +214,9 @@ export default {
     handleClose(){
       this.dialogVisible = false
     },
+    handleCloseInner(){
+      this.innerVisible = false
+    },
     handleClosed(){
       this.randomMovie = null
       this.currentCi = null
@@ -177,6 +226,13 @@ export default {
     },
     genImgUrl(title){
       return '/cover/'+md5(title)+'.png'
+    },
+    handerContentNoencode(html){
+      console.log(html)
+      return html.replace(/<section.*?section>/g,'')
+      .replace(/<iframe.*?iframe>/g,'')
+      .replace(/<img.*?>/g,'')
+      .replace('高清播放地址','')
     },
      _isMobile() {
        console.log(navigator.userAgent)
@@ -207,6 +263,32 @@ export default {
        this.isMuics = true
        this.dialogTitle = '音乐'
        this.dialogVisible = true
+    },
+    qrcode (domId,link) {
+        new QRCode(domId, {
+            width: 124,
+            height: 124,        // 高度
+            text: link,   // 二维码内容
+            // render: 'canvas' ,   // 设置渲染方式（有两种方式 table和canvas，默认是canvas）
+            // background: '#f0f',   // 背景色
+            // foreground: '#ff0'    // 前景色
+        })
+    },
+    shareImg(selector,link){
+      this.innerVisibleMsg = '图片生成中...'
+      this.innerVisible = true
+      const that = this
+      that.$nextTick(() => {
+        if(link!==undefined && link!==""){
+          that.qrcode('qrcode',link)
+        }
+        that.$nextTick(() => {
+          html2canvas(document.querySelector(selector)).then(function(canvas) {
+              that.innerVisibleMsg = '图片生成成功！可长按或右键保存图片'
+              document.querySelector("#inner-body-img-box").appendChild(canvas);
+          });
+        })
+      })
     },
     searchDoms(){
       let doms = document.querySelectorAll('a[textvalue*="'+this.searchKeyword+'"]')
@@ -254,5 +336,8 @@ a {
   left: 0;
   right: 0;
   z-index: 999;
+}
+#movie-body-img-box{
+
 }
 </style>
