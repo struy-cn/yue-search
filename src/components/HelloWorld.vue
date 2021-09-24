@@ -283,9 +283,13 @@ export default {
           that.qrcode('qrcode',link)
         }
         that.$nextTick(() => {
-          html2canvas(document.querySelector(selector)).then(function(canvas) {
+          html2canvas(document.querySelector(selector),{cale: 6}).then(function(canvas) {
               that.innerVisibleMsg = '图片生成成功！可长按或右键保存图片'
-              document.querySelector("#inner-body-img-box").appendChild(canvas);
+              const dom_img = document.createElement("img");
+              dom_img.src = canvas.toDataURL("image/jpeg")
+              dom_img.classList.add('el-image__inner')
+              dom_img.style = 'object-fit: cover;'
+              document.querySelector("#inner-body-img-box").appendChild(dom_img);
           });
         })
       })
