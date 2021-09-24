@@ -50,10 +50,10 @@
         <p>{{ randomMovie.linkContent.title }}</p>
         <blockquote>{{ randomMovie.linkContent.desc }}</blockquote>
         <!-- 图片暂时不能引用 -->
-        <!-- <el-image
-          style="width: 100px; height: 100px"
-          :src="randomMovie.linkContent.cdn_url"
-          :fit="fit"></el-image> -->
+        <el-image
+          :src="genImgUrl(randomMovie.title)"
+          fit="cover"> 
+        </el-image>
         <el-divider ></el-divider>
         <div v-html="randomMovie.linkContent.content_noencode.replace(/<section.*?section>/g,'').replace(/<iframe.*?iframe>/g,'').replace(/<img.*?>/g,'').replace('高清播放地址','')"></div>
       </div>
@@ -81,6 +81,7 @@
 
 <script>
 import axios from "axios";
+import md5 from "js-md5";
 
 export default {
   name: 'HelloWorld',
@@ -161,6 +162,9 @@ export default {
       this.dialogMsg = ""
       this.dialogTitle = '提示'
       this.isMuics = false
+    },
+    genImgUrl(title){
+      return '/cover/'+md5(title)+'.png'
     },
      _isMobile() {
        console.log(navigator.userAgent)

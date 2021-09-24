@@ -6,12 +6,25 @@ import requests
 import json
 import time
 import copy
+import hashlib
 
+img_path = './public/cover'
 db_path = './public/db'
 path = './public/wechat-page'
 files = os.listdir(path)
+cover_files = os.listdir(img_path)
 linkPattern = re.compile(r'<a.*?href="(.*?)".*?textvalue="(.*?)".*?>.*?<\/a>')
-allData = []
+
+
+def genearteMD5(str):
+    """
+    生成MD5
+    """
+    hl = hashlib.md5()
+    hl.update(str.encode(encoding='utf-8'))
+    return hl.hexdigest()
+
+
 for file in files:
     if not os.path.isdir(file):  # 判断是否是文件夹
         year = file.replace('.html', '')
@@ -51,7 +64,17 @@ for file in files:
                         fYear = open(db_path+'/'+year+'.json', 'w')
                         fYear.write(json_str)
                         fYear.close()
-            json_str = json.dumps(linkInfos, ensure_ascii=False)
-            fYear = open(db_path+'/'+year+'.json', 'w')
-            fYear.write(json_str)
-            fYear.close()
+        print("获取封面图")
+        for info in linkInfos:
+            cover_exist = list(filter(lambda x: (
+                genearteMD5(info['title']) in x), cover_files))
+            if not cover_exist:
+                file_name = genearteMD5(info['title'])+'.png'
+                cdn_url = info['linkContent']['cdn_url']
+                img_res = requests.get(cdn_url)
+                with open(img_path+'/'+file_name, 'wb') as img:
+                    img.write(img_res.content)
+        json_str = json.dumps(linkInfos, ensure_ascii=False)
+        fYear = open(db_path+'/'+year+'.json', 'w')
+        fYear.write(json_str)
+        fYear.close()
