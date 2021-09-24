@@ -67,7 +67,7 @@
         <p v-for="row in currentCi.paragraphs" :key="row">{{row}}</p>
       </div>
       <div v-else>
-        <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=86 src="//music.163.com/outchain/player?type=2&id=16846093&auto=1&height=66"></iframe>
+        <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=320 src="//music.163.com/outchain/player?type=0&id=6985955562&auto=1&height=430"></iframe>
       </div>
     </el-dialog>
     <el-divider >about project</el-divider>
