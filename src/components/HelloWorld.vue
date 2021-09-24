@@ -1,5 +1,6 @@
 <template>
-  <div class="hello" :style="isMobile?'margin-top: 60px;':''">
+  <div class="hello" v-loading="loading" element-loading-text="拼命加载中"
+    element-loading-spinner="el-icon-loading" :style="isMobile?'margin-top: 60px;':''">
     <h1>{{ msg }}</h1>
     <p>越哥说电影，专注好电影！</p>
     <p>
@@ -25,7 +26,11 @@
     </el-input>
   </div>
     <el-row v-if="datalen===htmls.length">
-      <el-col v-for="(item,index) in htmls" :key="index" :xs="24" :sm="6" :md="6" :lg="6" :xl="6"><p>{{item.title}}年解说合集</p><div class="grid-content bg-purple-dark" v-html="item.html"></div></el-col>
+      <el-col v-for="(item,index) in htmls" :key="index" :xs="24" :sm="6" :md="6" :lg="6" :xl="6"><p>{{item.title}}年解说合集</p>
+        <div class="grid-content bg-purple-dark" >
+          <p v-for="(movie,index) in allMovies.filter(x => x.year === item.title)" :key="movie.title"><a target="_blank" style="cursor: pointer;" @click="openMovieDetail(-1,movie)" :textvalue="movie.title.replace(/\d{1,3}、/,'')">{{(index+1)+'、'+movie.title.replace(/\d{1,3}、/,'')}}</a></p>
+        </div>
+      </el-col>
     </el-row>
     <el-dialog
       :title="dialogTitle"
@@ -44,7 +49,7 @@
       </div>
       <div v-else-if="randomMovie !== null && currentCi === null">
         <p>找到一个超棒的解说，去看看吧</p>
-        <p>🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉</p>
+        <p>🎉🎉🎉🎉🎉🎉(点此去观看)🎉🎉🎉🎉🎉🎉</p>
         <p><a :href="randomMovie.href">{{ randomMovie.title.replace(/\d{1,3}、/,'') }}</a></p>
         <el-divider ></el-divider>
         <p>{{ randomMovie.linkContent.title }}</p>
@@ -107,7 +112,8 @@ export default {
       songci:[],
       isMuics:false,
       currentCi:null,
-      allMovies:[]
+      allMovies:[],
+      loading:true
     }
   },
   created(){
@@ -123,14 +129,20 @@ export default {
            this.htmls.push({title:element.replace(".html",""),html:resx.data.replace(/<p><br\s\s\/><\/p>/g,'').replace(/<p><span style="font-size: \d\dpx;"><br\s\s\/><\/span><\/p>/g,'').replace(/<p style=""><br\s\s\/><\/p>/g,'')})
            if(this.datalen === this.htmls.length){
              this.htmls = this.htmls.sort((a, b) => a.title - b.title)
-             setTimeout(() => {
-             this.removeDefTitle()
-           },1)
+          //    setTimeout(() => {
+          //    this.removeDefTitle()
+          //  },1)
            }
          })
          axios.get('/db/'+element.replace(".html",".json")).then(resy => {
-           console.log(resy.data)
-           this.allMovies = this.allMovies.concat(resy.data)
+           const data = resy.data.map(x => {
+             x.year = element.replace(".html","")
+             return x
+             })
+             setTimeout(() => {
+              this.loading = false
+            },100)
+           this.allMovies = this.allMovies.concat(data)
          })
       }
     })
