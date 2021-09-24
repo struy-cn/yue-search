@@ -35,7 +35,7 @@
       @close="handleClose"
       @closed="handleClosed">
       <span>{{dialogMsg}}</span>
-      <div v-if="randomMovie === null && currentCi === null && dialogVisible && searchKeyword">
+      <div v-if="randomMovie === null && currentCi === null && dialogVisible && searchKeyword && !isMuics">
         <p><span>扫码去微信公众号查看</span></p>
         <p><img alt="Yue QR" src="qrcode.bmp"></p>
         <p ><a target="_blank" :href="bLink">前往B站查看</a></p>
@@ -43,7 +43,7 @@
         <p ><a target="_blank" :href="yLink">前往Youtube查看</a></p>
       </div>
       <div v-else-if="randomMovie !== null && currentCi === null">
-        <p>摇到一个超棒的解说，去看看吧</p>
+        <p>找到一个超棒的解说，去看看吧</p>
         <p>🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉</p>
         <p><a :href="randomMovie.href">{{ randomMovie.title.replace(/\d{1,3}、/,'') }}</a></p>
         <el-divider ></el-divider>
@@ -66,7 +66,11 @@
         <el-divider ></el-divider>
         <p v-for="row in currentCi.paragraphs" :key="row">{{row}}</p>
       </div>
-      <div v-else>
+      <div v-if="isMuics">
+        <p>
+          <span>世界没那糟，每天开心，睡个好觉😊</span>
+          <el-divider></el-divider>
+        </p>
         <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=320 src="//music.163.com/outchain/player?type=0&id=6985955562&auto=1&height=430"></iframe>
       </div>
     </el-dialog>
@@ -100,6 +104,7 @@ export default {
       isMobile:false,
       randomMovie: null,
       songci:[],
+      isMuics:false,
       currentCi:null,
       allMovies:[]
     }
@@ -155,18 +160,26 @@ export default {
       this.currentCi = null
       this.dialogMsg = ""
       this.dialogTitle = '提示'
+      this.isMuics = false
     },
      _isMobile() {
        console.log(navigator.userAgent)
       let flag = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)
       return flag;
     },
+    openMovieDetail(num=-1,movie){
+      if (num>=0){
+        this.randomMovie = this.allMovies[num]
+      }else{
+         this.randomMovie = movie
+      }
+      this.dialogVisible = true
+    },
     randomOpen(){
       //const movies = document.querySelectorAll('.grid-content  a')
       const num = Number(Math.floor(Math.random() * (this.allMovies.length)))
-      this.randomMovie = this.allMovies[num]
       this.dialogTitle = '手气不错'
-      this.dialogVisible = true
+      this.openMovieDetail(num)
     },
     songCi(){
       const num = Math.floor(Math.random() * (this.songci.length))
@@ -175,16 +188,21 @@ export default {
       this.dialogVisible = true
     },
     music(){
+       this.isMuics = true
        this.dialogTitle = '音乐'
        this.dialogVisible = true
     },
     searchDoms(){
       let doms = document.querySelectorAll('a[textvalue*="'+this.searchKeyword+'"]')
+      const movie = this.allMovies.filter((x) => x.title.includes(this.searchKeyword))
       this.bLink = 'https://space.bilibili.com/149558293/search/video?keyword='+this.searchKeyword
       this.xLink = 'https://www.ixigua.com/search/越哥说电影'+this.searchKeyword
       this.yLink = 'https://www.youtube.com/channel/UChgCVolsF6L7DWmOpWKSkMA/search?query='+this.searchKeyword
-      if(doms.length === 0){
+      if(movie.length === 0){
         this.showMsg('没有找到《'+this.searchKeyword+'》的解说，赶紧让越哥解说😂,或者去下面找找')
+      } else if(movie.length === 1) {
+        this.dialogTitle = '找到了一个解说'
+        this.openMovieDetail(-1,movie[0])
       }
       doms.forEach(x => {
         x.classList.add('search')
