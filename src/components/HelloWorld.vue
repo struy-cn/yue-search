@@ -17,7 +17,7 @@
     </p>
     <el-divider v-if="isMobile" ></el-divider>
     <div :class="isMobile?'search-input-mobile':'search-input'">
-    <el-input ref="keywordInput" :autofocus="true" placeholder="输入电影名" v-model="searchKeyword" @change="searchDoms" class="input-with-select">
+    <el-input ref="keywordInput"  placeholder="输入电影名" v-model="searchKeyword" @change="searchDoms" class="input-with-select">
       <el-select v-if="!isMobile" disabled v-model="select" slot="prepend" placeholder="请选择" style="width:100px;">
         <el-option label="公众号" :value="1" ></el-option>
         <el-option disabled label="B站" :value="2"></el-option>
