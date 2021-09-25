@@ -9,9 +9,11 @@
     <p>
       <a title="试试手气" href="javascript:void(0)" @click="randomOpen"><i class="el-icon-present"></i></a>
       <el-divider direction="vertical"></el-divider>
-      <a title="宋词" href="javascript:void(0)" @click="songCi"><i class="el-icon-reading"></i></a>
+      <a title="来首宋词" href="javascript:void(0)" @click="songCi"><i class="el-icon-reading"></i></a>
       <el-divider direction="vertical"></el-divider>
-      <a title="音乐" href="javascript:void(0)" @click="music"><i class="el-icon-moon"></i></a>
+      <a title="来首音乐" href="javascript:void(0)" @click="music"><i class="el-icon-headset"></i></a>
+      <el-divider direction="vertical"></el-divider>
+      <a title="关于" href="javascript:void(0)" @click="about"><i class="el-icon-warning-outline"></i></a>
     </p>
     <el-divider v-if="isMobile" ></el-divider>
     <div :class="isMobile?'search-input-mobile':'search-input'">
@@ -39,11 +41,14 @@
       @close="handleClose"
       @closed="handleClosed">
       <span slot="title">{{dialogTitle}}
+        <span v-if="randomMovie !== null && currentCi === null">
+          <el-divider direction="vertical"></el-divider>
+          <a title="img" href="javascript:void(0)" @click="shareImg('#movie-body',randomMovie.href)"><i class="el-icon-share"></i></a>
+        </span>
+      <span v-if="randomMovie === null && currentCi !== null">
         <el-divider direction="vertical"></el-divider>
-        <a v-if="randomMovie !== null && currentCi === null"
-         title="img" href="javascript:void(0)" @click="shareImg('#movie-body',randomMovie.href)"><i class="el-icon-share"></i></a>
-         <a v-if="randomMovie === null && currentCi !== null"
-         title="img" href="javascript:void(0)" @click="shareImg('#songci-body')"><i class="el-icon-share"></i></a>
+         <a title="img" href="javascript:void(0)" @click="shareImg('#songci-body')"><i class="el-icon-share"></i></a>
+      </span>
       </span>
       <span>{{dialogMsg}}</span>
       <div v-if="randomMovie === null && currentCi === null && dialogVisible && searchKeyword && !isMuics">
@@ -55,7 +60,7 @@
       </div>
       <div v-else-if="randomMovie !== null && currentCi === null">
         <p>找到一个超棒的解说，去看看吧</p>
-        <p>🎉🎉🎉🎉🎉🎉(点此去观看)🎉🎉🎉🎉🎉🎉</p>
+        <p>🎉🎉🎉🎉🎉🎉(点下方链接观看)🎉🎉🎉🎉🎉🎉</p>
         <div id="movie-body" >
           <br>
           <p><a :href="randomMovie.href">{{ randomMovie.title.replace(/\d{1,3}、/,'') }}</a></p>
@@ -110,7 +115,8 @@
           <span>世界没那糟，每天开心，睡个好觉😊</span>
           <el-divider></el-divider>
         </p>
-        <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=320 src="//music.163.com/outchain/player?type=0&id=6985955562&auto=1&height=430"></iframe>
+        <p style="color: #a2a2a4;">(由于网易外链播放器限制，部分音乐会替换为非原版)</p>
+        <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=400 src="//music.163.com/outchain/player?type=0&id=6985955562&auto=1&height=430"></iframe>
       </div>
       <el-dialog
           top="10px"
@@ -123,6 +129,37 @@
           <div id="inner-body-img-box" style="box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)">
           </div>
         </el-dialog>
+    </el-dialog>
+    <el-dialog 
+      :visible="dialogVisibleAbout"
+      :destroy-on-close="true"
+      title="关于本项目"
+      style="text-align: center;"
+      :width="isMobile?'90%':'50%'"
+      @close="handleCloseAbout"
+      @closed="handleClosedAbout">
+      <div style="text-align: left;">
+        <p>作者：<a target="_blank" href="https://github.com/StruggleYang">StruggleYang</a></p>
+        <p>关于：项目源于作者兴趣进行开发和维护，托管于GitHub，纯前端项目，数据来源于“越哥说电影”微信公众号>解说合集</p>
+        <el-collapse>
+          <el-collapse-item title="功能描述" name="1">
+            <ol style="padding-inline-start: 20px;">
+              <li>搜索解说全集，自动获取合集更新，不获取越哥实时单个更新</li>
+              <li>无法找到解说时可以跳转到其他平台查看，B站、西瓜、Youtube</li>
+              <li>搜索到的解说会携带公众号的文案/封面/观看链接可直接前往越哥公众号查看对应解说</li>
+              <li>试试手气，随机获得一个解说，用于漫无目的时发现以往的解说宝藏</li>
+              <li>来首宋词，随机获得一首宋词进行展示</li>
+              <li>来首音乐，播放在网易云音乐上收藏的越哥解说常用背景音乐</li>
+              <li>电影解说详情，试试手气，来首宋词可分享为图片海报，电影解说海报中携带目标解说地址二维码</li>
+            </ol>
+          </el-collapse-item>
+        </el-collapse>
+      </div>
+      <div style="text-align: center;">
+        <p>如果有瓶水喝就好了😂</p>
+        <el-image style="width: 180px; height: 180px" src="/qrcode/wechat-admire.jpeg" fit="cover"></el-image>
+        <el-image style="width: 180px; height: 180px" src="/qrcode/alipay.jpeg" fit="cover"></el-image>
+      </div>
     </el-dialog>
     <el-divider >about project</el-divider>
     <el-footer :style="isMobile?'margin-bottom: 40px;':''">© 2021 <a target="_blank" href="http://git66.com/soul">struy</a>｜<a target="_blank" href="https://github.com/StruggleYang/yue-search">源代码</a>｜本项目仅供学习使用，请勿用于商业用途！</el-footer>
@@ -162,7 +199,8 @@ export default {
       allMovies:[],
       loading:true,
       innerVisible:false,
-      innerVisibleMsg:''
+      innerVisibleMsg:'',
+      dialogVisibleAbout:false,
     }
   },
   created(){
@@ -224,6 +262,16 @@ export default {
       this.dialogTitle = '提示'
       this.isMuics = false
     },
+    handleCloseAbout(){
+      this.dialogVisibleAbout = false
+    },
+    handleClosedAbout(){
+
+    },
+    about(){
+      this.dialogVisibleAbout = true
+
+    },
     genImgUrl(title){
       return '/cover/'+md5(title)+'.png'
     },
@@ -232,7 +280,8 @@ export default {
       return html.replace(/<section.*?section>/g,'')
       .replace(/<iframe.*?iframe>/g,'')
       .replace(/<img.*?>/g,'')
-      .replace('高清播放地址','')
+      .replace(/<p.*?>.*?[高|备].*[清|用].*播.*放.*[地|视].*[址|频].*?<\/p>/,'')
+      .replace(/<p.*?票圈vlog.*?>.*?<\/p>/,'')
     },
      _isMobile() {
        console.log(navigator.userAgent)
@@ -261,7 +310,7 @@ export default {
     },
     music(){
        this.isMuics = true
-       this.dialogTitle = '音乐'
+       this.dialogTitle = '来首音乐'
        this.dialogVisible = true
     },
     qrcode (domId,link) {
