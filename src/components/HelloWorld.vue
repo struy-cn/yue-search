@@ -25,7 +25,7 @@
         <el-option disabled label="西瓜视频" :value="4"></el-option>
       </el-select>
       <template slot-scope="{ item }">
-        <div class="autocomplete-title"><span>{{ item.value }}</span><span class="autocomplete-time">&nbsp;-{{ item.createTime }}</span></div>
+        <div class="autocomplete-title"><span>{{ item.value }}</span><span class="autocomplete-time">&nbsp;-&nbsp;{{ item.createTime }}</span></div>
         <span class="autocomplete-time">&nbsp;{{ item.pageTitle }}</span>
       </template>
       <el-button slot="append" icon="el-icon-search" @click="searchDoms"></el-button>
