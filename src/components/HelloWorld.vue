@@ -144,13 +144,13 @@
         <el-collapse>
           <el-collapse-item title="功能描述" name="1">
             <ol style="padding-inline-start: 20px;">
-              <li>搜索解说全集，自动获取合集更新，不获取越哥实时单个更新</li>
+              <li><i class="el-icon-search like-link"></i>搜索解说全集，自动获取合集更新，不获取越哥实时单个更新</li>
               <li>无法找到解说时可以跳转到其他平台查看，B站、西瓜、Youtube</li>
               <li>搜索到的解说会携带公众号的文案/封面/观看链接可直接前往越哥公众号查看对应解说</li>
-              <li>试试手气，随机获得一个解说，用于漫无目的时发现以往的解说宝藏</li>
-              <li>来首宋词，随机获得一首宋词进行展示</li>
-              <li>来首音乐，播放在网易云音乐上收藏的越哥解说常用背景音乐</li>
-              <li>电影解说详情，试试手气，来首宋词可分享为图片海报，电影解说海报中携带目标解说地址二维码</li>
+              <li><i class="el-icon-present like-link"></i>试试手气，随机获得一个解说，用于漫无目的时发现以往的解说宝藏</li>
+              <li><i class="el-icon-reading like-link"></i>来首宋词，随机获得一首宋词进行展示</li>
+              <li><i class="el-icon-headset like-link"></i>来首音乐，播放在网易云音乐上收藏的越哥解说常用背景音乐</li>
+              <li>电影解说预览，<i class="el-icon-present like-link"></i>试试手气，<i class="el-icon-reading like-link"></i>来首宋词可在顶部<i class="el-icon-share like-link"></i>分享为图片海报，电影解说海报中携带目标解说地址二维码</li>
             </ol>
           </el-collapse-item>
         </el-collapse>
@@ -390,7 +390,7 @@ a {
   right: 0;
   z-index: 999;
 }
-#movie-body-img-box{
-
+.like-link{
+  color: #037b45;
 }
 </style>
