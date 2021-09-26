@@ -13,7 +13,9 @@ db_path = './public/db'
 path = './public/wechat-page'
 files = os.listdir(path)
 cover_files = os.listdir(img_path)
-linkPattern = re.compile(r'<a.*?href="(.*?)".*?textvalue="(.*?)".*?>.*?<\/a>')
+linkPattern = re.compile(
+    r'<a.*?href="(.*?)".*?textvalue="(.*?)".*?>.*?>(.*?)<\/span><\/a>')
+domPattern = re.compile("<.*?\/?>")
 
 
 def genearteMD5(str):
@@ -34,17 +36,23 @@ for file in files:
         f.close()
         # 解析已经存储过的html
         dbFilePath = db_path + "/" + year+'.json'
-        f1 = open(dbFilePath, 'r')
-        curr_year_json = f1.read()
-        f1.close()
-        curr_year_list = json.loads(curr_year_json)
+        hasDbFilePath = os.path.exists(dbFilePath)
+        curr_year_list = []
+        if hasDbFilePath:
+            f1 = open(dbFilePath, 'r')
+            curr_year_json = f1.read()
+            f1.close()
+            curr_year_list = json.loads(curr_year_json)
         # 解析html
         matchObj = linkPattern.findall(content)
         print('开始解析 %s' % year)
         if matchObj:
             linkInfos = copy.deepcopy(curr_year_list)
             for link in matchObj:
+                # 可能有其他字符
+                text = re.sub(domPattern, '', link[2])
                 title = link[1]
+                number = int(title.split("、")[0])
                 href = link[0]
                 exist = list(filter(lambda x: x.get('title') ==
                                     title and x.get('href') == href, curr_year_list))
@@ -54,8 +62,8 @@ for file in files:
                     try:
                         linkContent = requests.get(
                             hrefApi, headers={'Connection': 'close'}).json()
-                        linkInfo = {'title': title, 'href': href,
-                                    'linkContent': linkContent}
+                        linkInfo = {'title': title, 'href': href, 'text': text, 'number': number,
+                                    'coverLink': genearteMD5(title)+'.jpg', 'linkContent': linkContent}
                         time.sleep(1)
                         linkInfos.append(linkInfo)
                         print(len(linkInfos), '/', len(matchObj))
@@ -66,14 +74,15 @@ for file in files:
                         fYear.close()
         print("获取封面图")
         for info in linkInfos:
-            cover_exist = list(filter(lambda x: (
-                genearteMD5(info['title']) in x), cover_files))
+            cover_exist = list(
+                filter(lambda x: (info['coverLink'] == x), cover_files))
             if not cover_exist:
-                file_name = genearteMD5(info['title'])+'.png'
+                file_name = info['coverLink']
                 cdn_url = info['linkContent']['cdn_url']
                 img_res = requests.get(cdn_url)
                 with open(img_path+'/'+file_name, 'wb') as img:
                     img.write(img_res.content)
+        linkInfos.sort(key=lambda x: x['number'])
         json_str = json.dumps(linkInfos, ensure_ascii=False)
         fYear = open(db_path+'/'+year+'.json', 'w')
         fYear.write(json_str)

@@ -17,15 +17,19 @@
     </p>
     <el-divider v-if="isMobile" ></el-divider>
     <div :class="isMobile?'search-input-mobile':'search-input'">
-    <el-input ref="keywordInput"  placeholder="输入电影名" v-model="searchKeyword" @change="searchDoms" class="input-with-select">
+    <el-autocomplete :fetch-suggestions="keywordInputSearch" @select="searchDoms" ref="keywordInput"  placeholder="输入电影名" v-model="searchKeyword" class="input-with-select">
       <el-select v-if="!isMobile" disabled v-model="select" slot="prepend" placeholder="请选择" style="width:100px;">
         <el-option label="公众号" :value="1" ></el-option>
         <el-option disabled label="B站" :value="2"></el-option>
         <el-option disabled label="Youtube" :value="3"></el-option>
         <el-option disabled label="西瓜视频" :value="4"></el-option>
       </el-select>
+      <template slot-scope="{ item }">
+        <div class="autocomplete-title"><span>{{ item.value }}</span><span class="autocomplete-time">&nbsp;-{{ item.createTime }}</span></div>
+        <span class="autocomplete-time">&nbsp;{{ item.pageTitle }}</span>
+      </template>
       <el-button slot="append" icon="el-icon-search" @click="searchDoms"></el-button>
-    </el-input>
+    </el-autocomplete>
   </div>
     <el-row v-if="datalen===htmls.length">
       <el-col v-for="(item,index) in htmls" :key="index" :xs="24" :sm="6" :md="6" :lg="6" :xl="6"><p>{{item.title}}年解说合集</p>
@@ -68,7 +72,7 @@
           <p>{{ randomMovie.linkContent.title }}</p>
           <blockquote>{{ randomMovie.linkContent.desc }}</blockquote>
           <el-image
-            :src="genImgUrl(randomMovie.title)"
+            :src="genImgUrl(randomMovie)"
             fit="cover"> 
           </el-image>
           <el-divider ></el-divider>
@@ -168,7 +172,6 @@
 
 <script>
 import axios from "axios";
-import md5 from "js-md5";
 import html2canvas from 'html2canvas';
 import QRCode  from "qrcodejs2"
 
@@ -220,8 +223,11 @@ export default {
          })
          axios.get('/db/'+element.replace(".html",".json")).then(resy => {
            const data = resy.data.map(x => {
-             x.year = element.replace(".html","")
-             return x
+              x.year = element.replace(".html","")
+              if(x.title !== x.text){
+                x.title = x.text
+              }
+              return x
              })
              setTimeout(() => {
               this.loading = false
@@ -270,13 +276,21 @@ export default {
     },
     about(){
       this.dialogVisibleAbout = true
+    },
+    genImgUrl(movie){
+      return '/cover/'+movie.coverLink
+    },
+    keywordInputSearch(queryString, cb){
+      var results = queryString ? this.allMovies.filter(x => {
+          return x.title.includes(queryString)|x.text.includes(queryString)
+        }).map(x =>  {
+          return {"value":x.title.replace(/\d{1,3}、/,''),'createTime':x.linkContent.create_time,'pageTitle':x.linkContent.title}}) 
+          : this.allMovies.map(x => {return {"value":x.title.replace(/\d{1,3}、/,''),'createTime':x.linkContent.create_time,'pageTitle':x.linkContent.title}});
+      // 调用 callback 返回建议列表的数据
+      cb(results);
 
     },
-    genImgUrl(title){
-      return '/cover/'+md5(title)+'.png'
-    },
     handerContentNoencode(html){
-      console.log(html)
       return html.replace(/<section.*?section>/g,'')
       .replace(/<iframe.*?iframe>/g,'')
       .replace(/<img.*?>/g,'')
@@ -284,7 +298,6 @@ export default {
       .replace(/<p.*?票圈vlog.*?>.*?<\/p>/,'')
     },
      _isMobile() {
-       console.log(navigator.userAgent)
       let flag = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)
       return flag;
     },
@@ -392,5 +405,22 @@ a {
 }
 .like-link{
   color: #037b45;
+}
+.el-autocomplete{
+  display: block !important;
+}
+/* 搜索建议 */
+.el-autocomplete-suggestion li {
+  line-height: normal !important;
+  padding: 7px !important;
+}
+.autocomplete-title{
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.autocomplete-time{
+  font-size: 12px;
+  color: #a2a2a4;
+  text-overflow: ellipsis;
 }
 </style>
