@@ -82,7 +82,7 @@ for file in files:
                 img_res = requests.get(cdn_url)
                 with open(img_path+'/'+file_name, 'wb') as img:
                     img.write(img_res.content)
-        linkInfos.sort(key=lambda x: x['number'])
+        linkInfos.sort(key=lambda x: x['number'],reverse = True)
         json_str = json.dumps(linkInfos, ensure_ascii=False)
         fYear = open(db_path+'/'+year+'.json', 'w')
         fYear.write(json_str)

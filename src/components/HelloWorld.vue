@@ -34,7 +34,7 @@
     <el-row v-if="datalen===htmls.length">
       <el-col v-for="(item,index) in htmls" :key="index" :xs="24" :sm="6" :md="6" :lg="6" :xl="6"><p>{{item.title}}年解说合集</p>
         <div class="grid-content bg-purple-dark" >
-          <p v-for="(movie,index) in allMovies.filter(x => x.year === item.title)" :key="movie.title"><a target="_blank" style="cursor: pointer;" @click="openMovieDetail(-1,movie)" :textvalue="movie.title.replace(/\d{1,3}、/,'')">{{(index+1)+'、'+movie.title.replace(/\d{1,3}、/,'')}}</a></p>
+          <p v-for="(movie,index) in allMovies.filter(x => x.year === item.title)" :key="movie.title"><a target="_blank" style="cursor: pointer;" @click="openMovieDetail(-1,movie)" :textvalue="movie.title.replace(/\d{1,3}、/,'')">{{movie.title.replace(/\d{1,3}、/,'')}}</a></p>
         </div>
       </el-col>
     </el-row>
@@ -64,7 +64,7 @@
       </div>
       <div v-else-if="randomMovie !== null && currentCi === null">
         <p>找到一个超棒的解说，去看看吧</p>
-        <p>🎉🎉🎉🎉🎉🎉(点下方链接观看)🎉🎉🎉🎉🎉🎉</p>
+        <p>🎉🎉🎉🎉(点下方链接观看)🎉🎉🎉🎉</p>
         <div id="movie-body" >
           <br>
           <p><a :href="randomMovie.href">{{ randomMovie.title.replace(/\d{1,3}、/,'') }}</a></p>
@@ -116,7 +116,7 @@
       </div>
       <div v-if="isMuics">
         <p>
-          <span>世界没那糟，每天开心，睡个好觉😊</span>
+          <span>每天开心，睡个好觉😊</span>
           <el-divider></el-divider>
         </p>
         <p style="color: #a2a2a4;">(由于网易外链播放器限制，部分音乐会替换为非原版)</p>
@@ -218,7 +218,7 @@ export default {
         axios.get('/wechat-page/'+element).then(resx => {
            this.htmls.push({title:element.replace(".html",""),html:resx.data.replace(/<p><br\s\s\/><\/p>/g,'').replace(/<p><span style="font-size: \d\dpx;"><br\s\s\/><\/span><\/p>/g,'').replace(/<p style=""><br\s\s\/><\/p>/g,'')})
            if(this.datalen === this.htmls.length){
-             this.htmls = this.htmls.sort((a, b) => a.title - b.title)
+             this.htmls = this.htmls.sort((a, b) => b.title - a.title)
            }
          })
          axios.get('/db/'+element.replace(".html",".json")).then(resy => {
