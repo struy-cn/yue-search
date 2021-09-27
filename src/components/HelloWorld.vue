@@ -25,16 +25,16 @@
         <el-option disabled label="西瓜视频" :value="4"></el-option>
       </el-select>
       <template slot-scope="{ item }">
-        <div class="autocomplete-title"><span>{{ item.value }}</span><span class="autocomplete-time">&nbsp;-&nbsp;{{ item.createTime }}</span></div>
+        <div class="autocomplete-title"><span>{{ item.value }}</span><span class="autocomplete-time">-&nbsp;{{ item.createTime }}</span></div>
         <span class="autocomplete-time">&nbsp;{{ item.pageTitle }}</span>
       </template>
       <el-button slot="append" icon="el-icon-search" @click="searchDoms"></el-button>
     </el-autocomplete>
   </div>
     <el-row v-if="datalen===htmls.length">
-      <el-col v-for="(item,index) in htmls" :key="index" :xs="24" :sm="6" :md="6" :lg="6" :xl="6"><p>{{item.title}}年解说合集</p>
+      <el-col v-for="(item,index) in htmls" :key="index" :xs="24" :sm="6" :md="6" :lg="6" :xl="6"><p>{{item.title}}年解说合集<i class="el-icon-bottom"></i></p>
         <div class="grid-content bg-purple-dark" >
-          <p v-for="(movie) in allMovies.filter(x => x.year === item.title)" :key="movie.title"><a target="_blank" style="cursor: pointer;" @click="openMovieDetail(-1,movie)" :textvalue="movie.title.replace(/\d{1,3}、/,'')">{{movie.title.replace(/\d{1,3}、/,'')}}</a></p>
+          <p v-for="(movie) in allMovies.filter(x => x.year === item.title)" :key="movie.title"><a target="_blank" style="cursor: pointer;" @click="openMovieDetail(-1,movie)" :title="movie.title.replace(/\d{1,3}、/,'')+'-'+movie.linkContent.create_time" :textvalue="movie.title.replace(/\d{1,3}、/,'')">{{movie.title.replace(/\d{1,3}、/,'')}}</a></p>
         </div>
       </el-col>
     </el-row>
@@ -47,7 +47,7 @@
       <span slot="title">{{dialogTitle}}
         <span v-if="randomMovie !== null && currentCi === null">
           <el-divider direction="vertical"></el-divider>
-          <a title="img" href="javascript:void(0)" @click="shareImg('#movie-body',randomMovie.href)"><i class="el-icon-share"></i></a>
+          <a title="img" href="javascript:void(0)" @click="shareImg('#movie-body',randomMovie.href)"><i class="el-icon-share"></i>分享</a>
         </span>
       <span v-if="randomMovie === null && currentCi !== null">
         <el-divider direction="vertical"></el-divider>
@@ -68,8 +68,9 @@
         <div id="movie-body" >
           <br>
           <p><a :href="randomMovie.href">{{ randomMovie.title.replace(/\d{1,3}、/,'') }}</a></p>
+          <p style="color: #a2a2a4;font-size: 12px;">发布时间：{{randomMovie.linkContent.create_time}}</p>
           <el-divider ></el-divider>
-          <p>{{ randomMovie.linkContent.title }}</p>
+          <p style="padding: 0 5px 0 5px;"><span>{{ randomMovie.linkContent.title }}</span></p>
           <blockquote>{{ randomMovie.linkContent.desc }}</blockquote>
           <el-image
             :src="genImgUrl(randomMovie)"
@@ -82,12 +83,13 @@
             <el-divider ></el-divider>
             <p>扫码观看当前解说(直达)</p>
             <p id="qrcode"></p>
-            <el-footer style="background-color:#fafafa;line-height: 60px;">
-              <span>
+            <el-footer style="background-color:#fafafa;line-height: 25px;color: #a2a2a4;font-size: 12px;">
+              <div>
                 <span>via 越哥说电影合集</span>
                 <el-divider direction="vertical"></el-divider>
                 <span>yue.git66.com</span>
-              </span>
+              </div>
+              <div><span >{{ nowTime() }}</span></div>
             </el-footer>
           </div>
         </div>
@@ -105,12 +107,13 @@
         <el-divider ></el-divider>
         <p v-for="row in currentCi.paragraphs" :key="row">{{row}}</p>
         <div v-if="innerVisible">
-            <el-footer style="background-color:#fafafa;line-height: 60px;">
-              <span>
+            <el-footer style="background-color:#fafafa;line-height: 25px;color: #a2a2a4;font-size: 12px;">
+              <div>
                 <span>via 越哥说电影合集</span>
                 <el-divider direction="vertical"></el-divider>
                 <span>yue.git66.com</span>
-              </span>
+              </div>
+              <div><span >{{ nowTime() }}</span></div>
             </el-footer>
           </div>
       </div>
@@ -144,9 +147,9 @@
       @closed="handleClosedAbout">
       <div style="text-align: left;">
         <p>作者：<a target="_blank" href="https://github.com/StruggleYang">StruggleYang</a></p>
-        <p>关于：项目源于作者兴趣进行开发和维护，托管于GitHub，纯前端项目，数据来源于“越哥说电影”微信公众号>解说合集</p>
+        <p>关于：项目源于作者兴趣进行开发和维护，托管于GitHub，数据来源于“越哥说电影”微信公众号>解说合集，本站不做数据存储，只做数据索引(链接到越哥各平台主页/解说页，不直接展示视频)</p>
         <el-collapse>
-          <el-collapse-item title="功能描述" name="1">
+          <el-collapse-item title="功能描述(点此查看)" name="1">
             <ol style="padding-inline-start: 20px;">
               <li><i class="el-icon-search like-link"></i>搜索解说全集，自动获取合集更新，不获取越哥实时单个更新</li>
               <li>无法找到解说时可以跳转到其他平台查看，B站、西瓜、Youtube</li>
@@ -160,7 +163,7 @@
         </el-collapse>
       </div>
       <div style="text-align: center;">
-        <p>如果有瓶水喝就好了😂</p>
+        <p>建站不易，如果有瓶水喝就好了😂</p>
         <el-image style="width: 180px; height: 180px" src="/qrcode/wechat-admire.jpeg" fit="cover"></el-image>
         <el-image style="width: 180px; height: 180px" src="/qrcode/alipay.jpeg" fit="cover"></el-image>
       </div>
@@ -174,6 +177,7 @@
 import axios from "axios";
 import html2canvas from 'html2canvas';
 import QRCode  from "qrcodejs2"
+import moment from "moment"
 
 export default {
   name: 'HelloWorld',
@@ -206,7 +210,24 @@ export default {
       dialogVisibleAbout:false,
     }
   },
+  mounted(){
+    const showAboutNum = [2,5,10,20,40,70,100,200]
+    console.log('mounted')
+    const accessNum = localStorage.getItem('accessNum')
+    if(accessNum!==null&&!isNaN(accessNum)){
+      let currNum = Number(accessNum) + 1
+      if(showAboutNum.includes(currNum)){
+         this.$nextTick(() => {
+            this.about()
+         })
+      }
+      localStorage.setItem('accessNum',currNum );
+    }else{
+      localStorage.setItem('accessNum', 1);
+    }
+  },
   created(){
+    console.log('created')
     axios.get('/db/data.json').then(res => {
       if(res.data.length > 0){
           this.htmls = []
@@ -228,7 +249,7 @@ export default {
                 x.title = x.text
               }
               return x
-             })
+             }).sort((a,b) => b.linkContent.ori_create_time - a.linkContent.ori_create_time)
              setTimeout(() => {
               this.loading = false
             },100)
@@ -250,6 +271,9 @@ export default {
       contents.forEach(el => {
         el.removeChild(el.firstChild)
       })
+    },
+    nowTime(){
+      return moment().format("YYYY-MM-DD HH:mm:ss")
     },
     showMsg(msg){
       this.dialogVisible = true
@@ -405,6 +429,9 @@ a {
 }
 .like-link{
   color: #037b45;
+}
+.el-collapse-item__header{
+  color: #037b45 !important;
 }
 .el-autocomplete{
   display: block !important;
