@@ -10,7 +10,6 @@ fi
 cp CNAME ./docs
 git add .
 git commit -am "update page"
-git status
 if [ $? -eq 0 ]; then
     echo "Continue"
 else
