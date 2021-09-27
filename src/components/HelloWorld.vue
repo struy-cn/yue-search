@@ -39,6 +39,7 @@
       </el-col>
     </el-row>
     <el-dialog
+      top="20px"
       :visible="dialogVisible"
       :destroy-on-close="true"
       :width="isMobile?'90%':'50%'"
@@ -126,7 +127,7 @@
         <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=400 src="//music.163.com/outchain/player?type=0&id=6985955562&auto=1&height=430"></iframe>
       </div>
       <el-dialog
-          top="10px"
+          top="15px"
           :destroy-on-close="true"
           :width="isMobile?'90%':'50%'"
           @close="handleCloseInner"
@@ -138,6 +139,7 @@
         </el-dialog>
     </el-dialog>
     <el-dialog 
+      top="15px"
       :visible="dialogVisibleAbout"
       :destroy-on-close="true"
       title="关于本项目"
