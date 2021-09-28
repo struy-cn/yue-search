@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
-    <HelloWorld msg="越哥说电影解说合集"/>
+    <YueSearch title="越哥说电影解说合集"/>
     <a class="go-top" href="javascript:void(0)" @click="goTop">
       <i class="el-icon-top" aria-hidden="true"></i>
     </a>
@@ -9,12 +9,12 @@
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import YueSearch from './components/YueSearch.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    YueSearch
   },
   methods:{
     goTop(){

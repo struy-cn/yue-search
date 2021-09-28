@@ -1,7 +1,7 @@
 <template>
   <div class="hello" v-loading="loading" element-loading-text="拼命加载中"
     element-loading-spinner="el-icon-loading" :style="isMobile?'margin-top: 60px;':''">
-    <h1>{{ msg }}</h1>
+    <h1>{{ title }}</h1>
     <p>越哥说电影，专注好电影！</p>
     <p>
      (来源:微信公众号)
@@ -12,6 +12,8 @@
       <a title="来首宋词" href="javascript:void(0)" @click="songCi"><i class="el-icon-reading"></i></a>
       <el-divider direction="vertical"></el-divider>
       <a title="来首音乐" href="javascript:void(0)" @click="music"><i class="el-icon-headset"></i></a>
+      <el-divider direction="vertical"></el-divider>
+      <a title="来张海报" href="javascript:void(0)" @click="placard"><i class="el-icon-picture-outline-round"></i></a>
       <el-divider direction="vertical"></el-divider>
       <a title="关于" href="javascript:void(0)" @click="about"><i class="el-icon-warning-outline"></i></a>
     </p>
@@ -56,7 +58,7 @@
       </span>
       </span>
       <span>{{dialogMsg}}</span>
-      <div v-if="randomMovie === null && currentCi === null && dialogVisible && searchKeyword && !isMuics">
+      <div v-if="randomMovie === null && currentCi === null && dialogVisible && searchKeyword && !isMuics && !isPlacard">
         <p><span>扫码去微信公众号查看</span></p>
         <p><img alt="Yue QR" src="qrcode.bmp"></p>
         <p ><a target="_blank" :href="bLink">前往B站查看</a></p>
@@ -64,7 +66,7 @@
         <p ><a target="_blank" :href="yLink">前往Youtube查看</a></p>
       </div>
       <div v-else-if="randomMovie !== null && currentCi === null">
-        <p>找到一个超棒的解说，去看看吧</p>
+        <p>找到一个超棒的解说，去看看吧<el-divider direction="vertical"></el-divider><a title="换一个" href="javascript:void(0)" @click="randomOpen"><i class="el-icon-refresh"></i>换一个</a></p>
         <p>🎉🎉🎉🎉(点下方链接观看)🎉🎉🎉🎉</p>
         <div id="movie-body" >
           <br>
@@ -104,6 +106,10 @@
           <span>作者：{{ currentCi.author}}</span>
           <el-divider direction="vertical"></el-divider>
           <el-tag v-for=" tag in currentCi.tags" :key="tag" size="mini">{{tag}}</el-tag>
+          <span v-if="!innerVisible" >
+          <el-divider direction="vertical"></el-divider>
+          <a title="换一个" href="javascript:void(0)" @click="songCi"><i class="el-icon-refresh"></i></a>
+          </span>
         </p>
         <el-divider ></el-divider>
         <p v-for="row in currentCi.paragraphs" :key="row">{{row}}</p>
@@ -125,6 +131,13 @@
         </p>
         <p style="color: #a2a2a4;">(由于网易外链播放器限制，部分音乐会替换为非原版)</p>
         <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=400 src="//music.163.com/outchain/player?type=0&id=6985955562&auto=1&height=430"></iframe>
+      </div>
+      <div v-if="isPlacard">
+        <p>
+          <span>{{nowTimeDay()}}</span>
+          <el-divider></el-divider>
+        </p>
+        <div id="placard"></div>
       </div>
       <el-dialog
           top="15px"
@@ -149,6 +162,7 @@
       @closed="handleClosedAbout">
       <div style="text-align: left;">
         <p>作者：<a target="_blank" href="https://github.com/StruggleYang">StruggleYang</a></p>
+        <p>联系: <a type="email" target="_blank" href="mailto:yq1724555319@gmail.com">yq1724555319@gmail.com</a></p>
         <p>关于：项目源于作者兴趣进行开发和维护，托管于GitHub，数据来源于“越哥说电影”微信公众号>解说合集，本站不做数据存储，只做数据索引(链接到越哥各平台主页/解说页，不直接展示视频)</p>
         <el-collapse>
           <el-collapse-item title="功能描述(点此查看)" name="1">
@@ -182,11 +196,11 @@ import QRCode  from "qrcodejs2"
 import moment from "moment"
 
 export default {
-  name: 'HelloWorld',
+  name: 'YueSearch',
   components: {
   },
   props: {
-    msg: String
+    title: String
   },
   data(){
     return {
@@ -210,15 +224,19 @@ export default {
       innerVisible:false,
       innerVisibleMsg:'',
       dialogVisibleAbout:false,
+      isPlacard:false,
+      todayPlacard:null
     }
   },
   mounted(){
     const showAboutNum = [2,5,10,20,40,70,100,200]
     console.log('mounted')
     const accessNum = localStorage.getItem('accessNum')
+    let showAbout = false
     if(accessNum!==null&&!isNaN(accessNum)){
       let currNum = Number(accessNum) + 1
-      if(showAboutNum.includes(currNum)){
+      showAbout = showAboutNum.includes(currNum)
+      if(showAbout){
          this.$nextTick(() => {
             this.about()
          })
@@ -227,6 +245,11 @@ export default {
     }else{
       localStorage.setItem('accessNum', 1);
     }
+    this.$nextTick(() => {
+      if(!showAbout){
+        this.$refs.keywordInput.focus()
+      }
+    })
   },
   created(){
     console.log('created')
@@ -260,12 +283,10 @@ export default {
       }
     })
     this.isMobile = this._isMobile()
-    this.$nextTick(() => {
-      this.$refs.keywordInput.focus()
-    })
     axios.get('/db/songci300.json').then(res => {
       this.songci = res.data
     })
+    this.preLoadPlacrd()
   },
   methods:{
     removeDefTitle(){
@@ -276,6 +297,9 @@ export default {
     },
     nowTime(){
       return moment().format("YYYY-MM-DD HH:mm:ss")
+    },
+    nowTimeDay(){
+      return moment().format("YYYY-MM-DD")
     },
     showMsg(msg){
       this.dialogVisible = true
@@ -302,6 +326,14 @@ export default {
     },
     about(){
       this.dialogVisibleAbout = true
+    },
+    placard(){
+      this.isPlacard = true
+      this.dialogVisible = true
+      this.dialogTitle = '今日属于你的海报'
+      if(this.todayPlacard === null){
+        this.preLoadPlacrd(() => {document.querySelector("#placard").appendChild(this.todayPlacard)})
+      }else{this.$nextTick(() => document.querySelector("#placard").appendChild(this.todayPlacard))}
     },
     genImgUrl(movie){
       return '/cover/'+movie.coverLink
@@ -334,6 +366,22 @@ export default {
          this.randomMovie = movie
       }
       this.dialogVisible = true
+    },
+    preLoadPlacrd(cb=()=>{}){
+      axios.get('/db/placard.json').then(res => {
+        let url = localStorage.getItem('todayPlacardNum-'+this.nowTimeDay())
+        if(url === null){
+          const ran = Number(Math.floor(Math.random() * (res.data.length)))
+          url = res.data[ran]
+          localStorage.setItem('todayPlacardNum-'+this.nowTimeDay(),url );
+        }
+        const dom_img = document.createElement("img");
+        dom_img.src = url
+        dom_img.classList.add('el-image__inner')
+        dom_img.style = 'object-fit: cover;'
+        this.todayPlacard = dom_img
+        cb()
+      })
     },
     randomOpen(){
       //const movies = document.querySelectorAll('.grid-content  a')
