@@ -317,6 +317,7 @@ export default {
       this.dialogMsg = ""
       this.dialogTitle = '提示'
       this.isMuics = false
+      this.isPlacard = false
     },
     handleCloseAbout(){
       this.dialogVisibleAbout = false
