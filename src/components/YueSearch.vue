@@ -50,7 +50,7 @@
       <span slot="title">{{dialogTitle}}
         <span v-if="randomMovie !== null && currentCi === null">
           <el-divider direction="vertical"></el-divider>
-          <a title="img" href="javascript:void(0)" @click="shareImg('#movie-body',randomMovie.href)"><i class="el-icon-share"></i>分享</a>
+          <a title="img" href="javascript:void(0)" @click="shareImg('#movie-body',randomMovie.href)"><i class="el-icon-share"></i><span style="font-size: 14px;">分享</span></a>
         </span>
       <span v-if="randomMovie === null && currentCi !== null">
         <el-divider direction="vertical"></el-divider>
@@ -71,7 +71,7 @@
         <div id="movie-body" >
           <br>
           <p><a :href="randomMovie.href">{{ randomMovie.title.replace(/\d{1,3}、/,'') }}</a></p>
-          <p style="color: #a2a2a4;font-size: 12px;">发布时间：{{randomMovie.linkContent.create_time}}</p>
+          <p class="describe">发布时间：{{randomMovie.linkContent.create_time}}</p>
           <el-divider ></el-divider>
           <p style="padding: 0 5px 0 5px;"><span>{{ randomMovie.linkContent.title }}</span></p>
           <blockquote>{{ randomMovie.linkContent.desc }}</blockquote>
@@ -86,7 +86,7 @@
             <el-divider ></el-divider>
             <p>扫码观看当前解说(直达)</p>
             <p id="qrcode"></p>
-            <el-footer style="background-color:#fafafa;line-height: 25px;color: #a2a2a4;font-size: 12px;">
+            <el-footer style="background-color:#fafafa;line-height: 25px;" class="describe">
               <div>
                 <span>via 越哥说电影合集</span>
                 <el-divider direction="vertical"></el-divider>
@@ -114,7 +114,7 @@
         <el-divider ></el-divider>
         <p v-for="row in currentCi.paragraphs" :key="row">{{row}}</p>
         <div v-if="innerVisible">
-            <el-footer style="background-color:#fafafa;line-height: 25px;color: #a2a2a4;font-size: 12px;">
+            <el-footer style="background-color:#fafafa;line-height: 25px;" class="describe">
               <div>
                 <span>via 越哥说电影合集</span>
                 <el-divider direction="vertical"></el-divider>
@@ -129,15 +129,19 @@
           <span>每天开心，睡个好觉😊</span>
           <el-divider></el-divider>
         </p>
-        <p style="color: #a2a2a4;">(由于网易外链播放器限制，部分音乐会替换为非原版)</p>
-        <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=400 src="//music.163.com/outchain/player?type=0&id=6985955562&auto=1&height=430"></iframe>
+        <p class="describe">(由于网易外链播放器限制，部分音乐会替换为非原版)</p>
+        <p class="describe"><a href="https://y.music.163.com/m/playlist?app_version=8.5.31&id=6985955562&userid=74374168&creatorId=74374168">点击进入歌单</a></p>
+        <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=500 src="//music.163.com/outchain/player?type=0&id=6985955562&auto=1&height=430"></iframe>
       </div>
       <div v-if="isPlacard">
         <p>
           <span>{{nowTimeDay()}}</span>
           <el-divider></el-divider>
         </p>
-        <div id="placard"></div>
+        <div id="placard" v-if="todayPlacard">
+          <el-image :preview-src-list="[todayPlacard]"  :src="todayPlacard" fit="cover"></el-image>
+          <p class="describe">(点击查看大图/长按保存)</p>
+        </div>
       </div>
       <el-dialog
           top="15px"
@@ -184,8 +188,8 @@
         <el-image style="width: 180px; height: 180px" src="/qrcode/alipay.jpeg" fit="cover"></el-image>
       </div>
     </el-dialog>
-    <el-divider >about project</el-divider>
-    <el-footer :style="isMobile?'margin-bottom: 40px;':''">© 2021 <a target="_blank" href="http://git66.com/soul">struy</a>｜<a target="_blank" href="https://github.com/StruggleYang/yue-search">源代码</a>｜本项目仅供学习使用，请勿用于商业用途！</el-footer>
+    <el-divider ></el-divider>
+    <el-footer :style="isMobile?'margin-bottom: 40px;':''">© {{new Date().getFullYear()}} <a target="_blank" href="http://git66.com/soul">struy</a>｜<a target="_blank" href="https://github.com/StruggleYang/yue-search">源代码</a>｜本项目仅供学习使用，请勿用于商业用途！</el-footer>
   </div>
 </template>
 
@@ -331,17 +335,17 @@ export default {
     placard(){
       this.isPlacard = true
       this.dialogVisible = true
-      this.dialogTitle = '今日属于你的海报'
+      this.dialogTitle = '今日属于您的海报'
       if(this.todayPlacard === null){
-        this.preLoadPlacrd(() => {document.querySelector("#placard").appendChild(this.todayPlacard)})
-      }else{this.$nextTick(() => document.querySelector("#placard").appendChild(this.todayPlacard))}
+        this.preLoadPlacrd()
+      }
     },
     genImgUrl(movie){
       return '/cover/'+movie.coverLink
     },
     keywordInputSearch(queryString, cb){
       var results = queryString ? this.allMovies.filter(x => {
-          return x.title.includes(queryString)|x.text.includes(queryString)
+          return x.title.includes(queryString)|x.text.includes(queryString)|x.linkContent.title.includes(queryString)
         }).map(x =>  {
           return {"value":x.title.replace(/\d{1,3}、/,''),'createTime':x.linkContent.create_time,'pageTitle':x.linkContent.title}}) 
           : this.allMovies.map(x => {return {"value":x.title.replace(/\d{1,3}、/,''),'createTime':x.linkContent.create_time,'pageTitle':x.linkContent.title}});
@@ -378,9 +382,7 @@ export default {
         }
         const dom_img = document.createElement("img");
         dom_img.src = url
-        dom_img.classList.add('el-image__inner')
-        dom_img.style = 'object-fit: cover;'
-        this.todayPlacard = dom_img
+        this.todayPlacard = url
         cb()
       })
     },
@@ -500,5 +502,9 @@ a {
   font-size: 12px;
   color: #a2a2a4;
   text-overflow: ellipsis;
+}
+.describe{
+  color: #a2a2a4;
+  font-size: 12px;
 }
 </style>
