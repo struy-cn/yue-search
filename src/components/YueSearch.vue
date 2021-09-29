@@ -1,7 +1,9 @@
 <template>
-  <div class="hello" v-loading="loading" element-loading-text="拼命加载中"
-    element-loading-spinner="el-icon-loading" :style="isMobile?'margin-top: 60px;':''">
-    <h1>{{ title }}</h1>
+  <div class="yue-search" v-loading="loading" element-loading-text="拼命加载中"
+    element-loading-background="rgba(0, 0, 0, 0.8)"
+    element-loading-spinner="el-icon-loading"
+    :fullscreen="true" :body="true">
+    <h1 :style="isMobile?'margin-top: 60px;':''">{{ title }}</h1>
     <p>越哥说电影，专注好电影！</p>
     <p>
      (来源:微信公众号)
@@ -69,7 +71,7 @@
         <p>找到一个超棒的解说，去看看吧<el-divider direction="vertical"></el-divider><a title="换一个" href="javascript:void(0)" @click="randomOpen"><i class="el-icon-refresh"></i>换一个</a></p>
         <p>🎉🎉🎉🎉(点下方链接观看)🎉🎉🎉🎉</p>
         <div id="movie-body" >
-          <br>
+          <br v-if="innerVisible">
           <p><a :href="randomMovie.href">{{ randomMovie.title.replace(/\d{1,3}、/,'') }}</a></p>
           <p class="describe">发布时间：{{randomMovie.linkContent.create_time}}</p>
           <el-divider ></el-divider>
@@ -166,7 +168,7 @@
       @closed="handleClosedAbout">
       <div style="text-align: left;">
         <p>作者：<a target="_blank" href="https://github.com/StruggleYang">StruggleYang</a></p>
-        <p>联系: <a type="email" target="_blank" href="mailto:yq1724555319@gmail.com">yq1724555319@gmail.com</a></p>
+        <p>联系： <a type="email" target="_blank" href="mailto:yq1724555319@gmail.com">yq1724555319@gmail.com</a></p>
         <p>关于：项目源于作者兴趣进行开发和维护，托管于GitHub，数据来源于“越哥说电影”微信公众号>解说合集，本站不做数据存储，只做数据索引(链接到越哥各平台主页/解说页，不直接展示视频)</p>
         <el-collapse>
           <el-collapse-item title="功能描述(点此查看)" name="1">
@@ -204,7 +206,8 @@ export default {
   components: {
   },
   props: {
-    title: String
+    title: String,
+    isDarkMode: Boolean
   },
   data(){
     return {
@@ -456,6 +459,13 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style >
+.yue-search{
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
 a {
   text-decoration:none !important;
   color: #037b45;
@@ -478,7 +488,7 @@ a {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 999;
+  z-index: 123;
 }
 .like-link{
   color: #037b45;
