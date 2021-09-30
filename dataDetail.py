@@ -76,14 +76,23 @@ for file in files:
         for info in linkInfos:
             cover_exist = list(
                 filter(lambda x: (info['coverLink'] == x), cover_files))
-            if not cover_exist:
+            if (not cover_exist) and info.get('linkContent'):
                 file_name = info['coverLink']
                 cdn_url = info['linkContent']['cdn_url']
                 img_res = requests.get(cdn_url)
                 with open(img_path+'/'+file_name, 'wb') as img:
                     img.write(img_res.content)
-        linkInfos.sort(key=lambda x: x['number'],reverse = True)
+            if info.get('linkContent'):
+                info['pageTitle'] = info['linkContent']['title']
+                info['desc'] = info['linkContent']['desc']
+                info['contentNoencode'] = info['linkContent']['content_noencode']
+                info['createTime'] = info['linkContent']['create_time']
+                info['oriCreateTime'] = info['linkContent']['ori_create_time']
+                del info['linkContent']
+        linkInfos.sort(key=lambda x: x['oriCreateTime'], reverse=True)
         json_str = json.dumps(linkInfos, ensure_ascii=False)
         fYear = open(db_path+'/'+year+'.json', 'w')
+        fYear.seek(0)
+        fYear.truncate()
         fYear.write(json_str)
         fYear.close()

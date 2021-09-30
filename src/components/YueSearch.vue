@@ -38,7 +38,7 @@
     <el-row v-if="datalen===htmls.length">
       <el-col v-for="(item,index) in htmls" :key="index" :xs="24" :sm="6" :md="6" :lg="6" :xl="6"><p>{{item.title}}年解说合集<i class="el-icon-bottom"></i></p>
         <div class="grid-content bg-purple-dark" >
-          <p v-for="(movie) in allMovies.filter(x => x.year === item.title)" :key="movie.title"><a target="_blank" style="cursor: pointer;" @click="openMovieDetail(-1,movie)" :title="movie.title.replace(/\d{1,3}、/,'')+'-'+movie.linkContent.create_time" :textvalue="movie.title.replace(/\d{1,3}、/,'')">{{movie.title.replace(/\d{1,3}、/,'')}}</a></p>
+          <p v-for="(movie) in allMovies.filter(x => x.year === item.title)" :key="movie.title"><a target="_blank" style="cursor: pointer;" @click="openMovieDetail(-1,movie)" :title="movie.title.replace(/\d{1,3}、/,'')+'-'+movie.createTime" :textvalue="movie.title.replace(/\d{1,3}、/,'')">{{movie.title.replace(/\d{1,3}、/,'')}}</a></p>
         </div>
       </el-col>
     </el-row>
@@ -73,16 +73,16 @@
         <div id="movie-body" >
           <br v-if="innerVisible">
           <p><a :href="randomMovie.href">{{ randomMovie.title.replace(/\d{1,3}、/,'') }}</a></p>
-          <p class="describe">发布时间：{{randomMovie.linkContent.create_time}}</p>
+          <p class="describe">发布时间：{{randomMovie.createTime}}</p>
           <el-divider ></el-divider>
-          <p style="padding: 0 5px 0 5px;"><span>{{ randomMovie.linkContent.title }}</span></p>
-          <blockquote>{{ randomMovie.linkContent.desc }}</blockquote>
+          <p style="padding: 0 5px 0 5px;"><span>{{ randomMovie.pageTitle }}</span></p>
+          <blockquote>{{ randomMovie.desc }}</blockquote>
           <el-image
             :src="genImgUrl(randomMovie)"
             fit="cover"> 
           </el-image>
           <el-divider ></el-divider>
-          <div v-html="handerContentNoencode(randomMovie.linkContent.content_noencode)"></div>
+          <div v-html="handerContentNoencode(randomMovie.contentNoencode)"></div>
           <br>
           <div v-if="innerVisible">
             <el-divider ></el-divider>
@@ -210,7 +210,7 @@ export default {
   },
   data(){
     return {
-      htmls:[{title:'未知',html:'<p>数据未知</p>'}],
+      htmls:[{title:'未知'}],
       datalen:1,
       select:1,
       searchKeyword:'',
@@ -268,12 +268,17 @@ export default {
 
       for (let index = 0; index < res.data.length; index++) {
         const element = res.data[index];
-        axios.get('/wechat-page/'+element).then(resx => {
-           this.htmls.push({title:element.replace(".html",""),html:resx.data.replace(/<p><br\s\s\/><\/p>/g,'').replace(/<p><span style="font-size: \d\dpx;"><br\s\s\/><\/span><\/p>/g,'').replace(/<p style=""><br\s\s\/><\/p>/g,'')})
-           if(this.datalen === this.htmls.length){
-             this.htmls = this.htmls.sort((a, b) => b.title - a.title)
-           }
-         })
+        this.htmls.push({title:element.replace(".html","")})
+        if(this.datalen === this.htmls.length){
+          this.htmls = this.htmls.sort((a, b) => b.title - a.title)
+        }
+        console.log(this.htmls)
+        // axios.get('/wechat-page/'+element).then(resx => {
+        //    this.htmls.push({title:element.replace(".html",""),html:resx.data.replace(/<p><br\s\s\/><\/p>/g,'').replace(/<p><span style="font-size: \d\dpx;"><br\s\s\/><\/span><\/p>/g,'').replace(/<p style=""><br\s\s\/><\/p>/g,'')})
+        //    if(this.datalen === this.htmls.length){
+        //      this.htmls = this.htmls.sort((a, b) => b.title - a.title)
+        //    }
+        //  })
          axios.get('/db/'+element.replace(".html",".json")).then(resy => {
            const data = resy.data.map(x => {
               x.year = element.replace(".html","")
@@ -281,7 +286,7 @@ export default {
                 x.title = x.text
               }
               return x
-             }).sort((a,b) => b.linkContent.ori_create_time - a.linkContent.ori_create_time)
+             }).sort((a,b) => b.oriCreateTime - a.oriCreateTime)
              setTimeout(() => {
               this.loading = false
             },100)
@@ -352,10 +357,10 @@ export default {
     },
     keywordInputSearch(queryString, cb){
       var results = queryString ? this.allMovies.filter(x => {
-          return x.title.includes(queryString)|x.text.includes(queryString)|x.linkContent.title.includes(queryString)
+          return x.title.includes(queryString)|x.text.includes(queryString)|x.pageTitle.includes(queryString)
         }).map(x =>  {
-          return {"value":x.title.replace(/\d{1,3}、/,''),'createTime':x.linkContent.create_time,'pageTitle':x.linkContent.title}}) 
-          : this.allMovies.map(x => {return {"value":x.title.replace(/\d{1,3}、/,''),'createTime':x.linkContent.create_time,'pageTitle':x.linkContent.title}});
+          return {"value":x.title.replace(/\d{1,3}、/,''),'createTime':x.createTime,'pageTitle':x.pageTitle}}) 
+          : this.allMovies.map(x => {return {"value":x.title.replace(/\d{1,3}、/,''),'createTime':x.createTime,'pageTitle':x.pageTitle}});
       // 调用 callback 返回建议列表的数据
       cb(results);
 
