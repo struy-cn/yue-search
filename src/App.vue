@@ -1,8 +1,8 @@
 <template>
   <div id="app" :class="getDarkMode()?'darkmode':''">
     <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
-    <YueSearch title="越哥说电影解说合集" :isDarkMode="getDarkMode()"/>
-    <a class="go-top" href="javascript:void(0)" @click="goTop">
+    <YueSearch ref="yueSearch" title="越哥说电影解说合集"/>
+    <a class="go-top" href="javascript:void(0)" @click="goTop()">
       <i class="el-icon-top" aria-hidden="true"></i>
     </a>
     <a class="toggleDarkMode" href="javascript:void(0)" @click="toggleDarkMode()">
@@ -27,7 +27,7 @@ export default {
       darkModeSetting:'auto'
     }
   },
-  created(){
+  mounted(){
     this.getSystemDarkMode()
     this.getDarkModeSetting()
     this.checkDarkMode()
@@ -98,6 +98,9 @@ export default {
         document.body.classList.add('darkmode')
       }else{
           document.body.classList.remove('darkmode')
+      }
+      if(this.$refs.yueSearch !== undefined){
+        this.$refs.yueSearch.darkModeChange(this.getDarkMode())
       }
     }
   }

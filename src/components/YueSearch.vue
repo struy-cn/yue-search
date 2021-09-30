@@ -88,7 +88,7 @@
             <el-divider ></el-divider>
             <p>扫码观看当前解说(直达)</p>
             <p id="qrcode"></p>
-            <el-footer style="background-color:#fafafa;line-height: 25px;" class="describe">
+            <el-footer :class="'describe'+' share-footer'+(isDarkMode?' darkmode':'')">
               <div>
                 <span>via 越哥说电影合集</span>
                 <el-divider direction="vertical"></el-divider>
@@ -116,8 +116,8 @@
         <el-divider ></el-divider>
         <p v-for="row in currentCi.paragraphs" :key="row">{{row}}</p>
         <div v-if="innerVisible">
-            <el-footer style="background-color:#fafafa;line-height: 25px;" class="describe">
-              <div>
+            <el-footer :class="'describe'+' share-footer'+(isDarkMode?' darkmode':'')">
+              <div >
                 <span>via 越哥说电影合集</span>
                 <el-divider direction="vertical"></el-divider>
                 <span>yue.git66.com</span>
@@ -206,8 +206,7 @@ export default {
   components: {
   },
   props: {
-    title: String,
-    isDarkMode: Boolean
+    title: String
   },
   data(){
     return {
@@ -232,7 +231,8 @@ export default {
       innerVisibleMsg:'',
       dialogVisibleAbout:false,
       isPlacard:false,
-      todayPlacard:null
+      todayPlacard:null,
+      isDarkMode:false,
     }
   },
   mounted(){
@@ -296,6 +296,10 @@ export default {
     this.preLoadPlacrd()
   },
   methods:{
+    darkModeChange(isDarkMode){
+      this.isDarkMode = isDarkMode
+      console.log(this.isDarkMode)
+    },
     removeDefTitle(){
       let contents = document.getElementsByClassName('grid-content')
       contents.forEach(el => {
@@ -419,6 +423,11 @@ export default {
     shareImg(selector,link){
       this.innerVisibleMsg = '图片生成中...'
       this.innerVisible = true
+      if(this.isDarkMode){
+        document.querySelector(selector).classList.add('darkmode')
+      }else{
+        document.querySelector(selector).classList.remove('darkmode')
+      }
       const that = this
       that.$nextTick(() => {
         if(link!==undefined && link!==""){
@@ -516,5 +525,9 @@ a {
 .describe{
   color: #a2a2a4;
   font-size: 12px;
+}
+.share-footer{
+  background-color:#fafafa;
+  line-height: 25px;
 }
 </style>
