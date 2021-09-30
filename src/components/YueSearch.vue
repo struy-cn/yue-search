@@ -236,7 +236,7 @@ export default {
     }
   },
   mounted(){
-    const showAboutNum = [2,5,10,20,40,70,100,200]
+    const showAboutNum = [10,20,40,70,100,200]
     console.log('mounted')
     const accessNum = localStorage.getItem('accessNum')
     let showAbout = false
