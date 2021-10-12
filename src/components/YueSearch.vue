@@ -131,9 +131,9 @@
           <span>每天开心，睡个好觉😊</span>
           <el-divider></el-divider>
         </p>
-        <p class="describe">(由于网易外链播放器限制，部分音乐会替换为非原版)</p>
-        <p class="describe"><a href="https://y.music.163.com/m/playlist?app_version=8.5.31&id=6985955562&userid=74374168&creatorId=74374168">点击进入歌单</a></p>
-        <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=500 src="//music.163.com/outchain/player?type=0&id=6985955562&auto=1&height=430"></iframe>
+        <p class="describe">(由于网易外链播放器限制，部分音乐会替换为非原版，且播放器只展示10首，可点击链接查看完整歌单)</p>
+        <p class="describe"><a href="https://y.music.163.com/m/playlist?app_version=8.5.31&id=6985955562&userid=74374168&creatorId=74374168">点击查看详细歌单</a></p>
+        <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=500 src="//music.163.com/outchain/player?type=0&id=7017013032&auto=1&height=430"></iframe>
       </div>
       <div v-if="isPlacard">
         <p>
@@ -182,12 +182,14 @@
               <li>电影解说预览，<i class="el-icon-present like-link"></i>试试手气，<i class="el-icon-reading like-link"></i>来首宋词可在顶部<i class="el-icon-share like-link"></i>分享为图片海报，电影解说海报中携带目标解说地址二维码</li>
             </ol>
           </el-collapse-item>
+          <el-collapse-item title="喜欢本站💖" name="2">
+            <div style="text-align: center;">
+              <p>建站不易，如果有瓶水喝就好了😂</p>
+              <el-image style="width: 180px; height: 180px" src="/qrcode/wechat-admire.jpeg" fit="cover"></el-image>
+              <el-image style="width: 180px; height: 180px" src="/qrcode/alipay.jpeg" fit="cover"></el-image>
+            </div>
+          </el-collapse-item>
         </el-collapse>
-      </div>
-      <div style="text-align: center;">
-        <p>建站不易，如果有瓶水喝就好了😂</p>
-        <el-image style="width: 180px; height: 180px" src="/qrcode/wechat-admire.jpeg" fit="cover"></el-image>
-        <el-image style="width: 180px; height: 180px" src="/qrcode/alipay.jpeg" fit="cover"></el-image>
       </div>
     </el-dialog>
     <el-divider ></el-divider>
@@ -236,7 +238,7 @@ export default {
     }
   },
   mounted(){
-    const showAboutNum = [10,20,40,70,100,200]
+    const showAboutNum = [200]
     console.log('mounted')
     const accessNum = localStorage.getItem('accessNum')
     let showAbout = false
