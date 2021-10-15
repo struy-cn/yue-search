@@ -9,15 +9,15 @@
      (来源:微信公众号)
     </p>
     <p>
-      <a title="试试手气" href="javascript:void(0)" @click="randomOpen"><i class="el-icon-present"></i></a>
+      <a title="试试手气" href="javascript:void(0)" @click="randomOpen"><i class="el-icon-present">影</i></a>
       <el-divider direction="vertical"></el-divider>
-      <a title="来首宋词" href="javascript:void(0)" @click="songCi"><i class="el-icon-reading"></i></a>
+      <a title="来首音乐" href="javascript:void(0)" @click="music"><i class="el-icon-headset">音</i></a>
       <el-divider direction="vertical"></el-divider>
-      <a title="来首音乐" href="javascript:void(0)" @click="music"><i class="el-icon-headset"></i></a>
+      <a title="来张海报" href="javascript:void(0)" @click="placard"><i class="el-icon-picture-outline-round">图</i></a>
       <el-divider direction="vertical"></el-divider>
-      <a title="来张海报" href="javascript:void(0)" @click="placard"><i class="el-icon-picture-outline-round"></i></a>
+      <a title="来首宋词" href="javascript:void(0)" @click="songCi"><i class="el-icon-reading">词</i></a>
       <el-divider direction="vertical"></el-divider>
-      <a title="关于" href="javascript:void(0)" @click="about"><i class="el-icon-warning-outline"></i></a>
+      <a title="关于" href="javascript:void(0)" @click="about"><i class="el-icon-warning-outline">友</i></a>
     </p>
     <el-divider v-if="isMobile" ></el-divider>
     <div :class="isMobile?'search-input-mobile':'search-input'">
@@ -68,11 +68,18 @@
         <p ><a target="_blank" :href="yLink">前往Youtube查看</a></p>
       </div>
       <div v-else-if="randomMovie !== null && currentCi === null">
-        <p>找到一个超棒的解说，去看看吧<el-divider direction="vertical"></el-divider><a title="换一个" href="javascript:void(0)" @click="randomOpen"><i class="el-icon-refresh"></i>换一个</a></p>
-        <p>🎉🎉🎉🎉(点下方链接观看)🎉🎉🎉🎉</p>
+        <p>🎉找到一个超棒的解说，去看看吧<el-divider direction="vertical"></el-divider><a title="换一个" href="javascript:void(0)" @click="randomOpen"><i class="el-icon-refresh"></i>换一个</a></p>
+        <p class="describe">点链接观看，如资源失效点击B站/西瓜/Yb查看</p>
         <div id="movie-body" >
           <br v-if="innerVisible">
           <p><a :href="randomMovie.href">{{ randomMovie.title.replace(/\d{1,3}、/,'') }}</a></p>
+          <p v-if="!innerVisible">
+            <a target="_blank" :href="bLink">B站</a>
+            <el-divider direction="vertical"></el-divider>
+            <a target="_blank" :href="xLink">西瓜</a>
+            <el-divider direction="vertical"></el-divider>
+            <a target="_blank" :href="yLink">Youtube</a>
+          </p>
           <p class="describe">发布时间：{{randomMovie.createTime}}</p>
           <el-divider ></el-divider>
           <p style="padding: 0 5px 0 5px;"><span>{{ randomMovie.pageTitle }}</span></p>
@@ -168,10 +175,10 @@
       @closed="handleClosedAbout">
       <div style="text-align: left;">
         <p>作者：<a target="_blank" href="https://github.com/StruggleYang">StruggleYang</a></p>
-        <p>联系： <a type="email" target="_blank" href="mailto:yq1724555319@gmail.com">yq1724555319@gmail.com</a></p>
+        <p>邮箱： <a type="email" target="_blank" href="mailto:yq1724555319@gmail.com">yq1724555319@gmail.com</a></p>
         <p>关于：项目源于作者兴趣进行开发和维护，托管于GitHub，数据来源于“越哥说电影”微信公众号>解说合集，本站不做数据存储，只做数据索引(链接到越哥各平台主页/解说页，不直接展示视频)</p>
         <el-collapse>
-          <el-collapse-item title="功能描述(点此查看)" name="1">
+          <el-collapse-item title="功能描述📒" name="1">
             <ol style="padding-inline-start: 20px;">
               <li><i class="el-icon-search like-link"></i>搜索解说全集，自动获取合集更新，不获取越哥实时单个更新</li>
               <li>无法找到解说时可以跳转到其他平台查看，B站、西瓜、Youtube</li>
@@ -182,9 +189,15 @@
               <li>电影解说预览，<i class="el-icon-present like-link"></i>试试手气，<i class="el-icon-reading like-link"></i>来首宋词可在顶部<i class="el-icon-share like-link"></i>分享为图片海报，电影解说海报中携带目标解说地址二维码</li>
             </ol>
           </el-collapse-item>
-          <el-collapse-item title="喜欢本站💖" name="2">
+          <el-collapse-item title="交个朋友👬" name="2">
             <div style="text-align: center;">
-              <p>建站不易，如果有瓶水喝就好了😂</p>
+              <p>我的个人微信，欢迎来撩，请备注: 越哥解说合集</p>
+              <el-image style="width: 180px; height: 180px" src="/qrcode/Wechat.jpeg" fit="cover"></el-image>
+            </div>
+          </el-collapse-item>
+          <el-collapse-item title="喜欢本站💖" name="3">
+            <div style="text-align: center;">
+              <p>不会真有人会赞赏我吧😂</p>
               <el-image style="width: 180px; height: 180px" src="/qrcode/wechat-admire.jpeg" fit="cover"></el-image>
               <el-image style="width: 180px; height: 180px" src="/qrcode/alipay.jpeg" fit="cover"></el-image>
             </div>
@@ -384,6 +397,7 @@ export default {
       }else{
          this.randomMovie = movie
       }
+      this.genOtherLink(this.randomMovie.title.replace(/\d{1,3}、/,''))
       this.dialogVisible = true
     },
     preLoadPlacrd(cb=()=>{}){
@@ -452,12 +466,15 @@ export default {
         })
       })
     },
+    genOtherLink(movieName){
+      this.bLink = 'https://space.bilibili.com/149558293/search/video?keyword='+movieName
+      this.xLink = 'https://www.ixigua.com/search/越哥说电影'+movieName
+      this.yLink = 'https://www.youtube.com/channel/UChgCVolsF6L7DWmOpWKSkMA/search?query='+movieName
+    },
     searchDoms(){
       let doms = document.querySelectorAll('a[textvalue*="'+this.searchKeyword+'"]')
       const movie = this.allMovies.filter((x) => x.title.includes(this.searchKeyword))
-      this.bLink = 'https://space.bilibili.com/149558293/search/video?keyword='+this.searchKeyword
-      this.xLink = 'https://www.ixigua.com/search/越哥说电影'+this.searchKeyword
-      this.yLink = 'https://www.youtube.com/channel/UChgCVolsF6L7DWmOpWKSkMA/search?query='+this.searchKeyword
+      this.genOtherLink(this.searchKeyword)
       if(movie.length === 0){
         this.showMsg('没有找到《'+this.searchKeyword+'》的解说，赶紧让越哥解说😂,或者去下面找找')
       } else if(movie.length === 1) {
