@@ -99,7 +99,7 @@
               <div>
                 <span>via 越哥说电影合集</span>
                 <el-divider direction="vertical"></el-divider>
-                <span>yue.git66.com</span>
+                <span>{{ window.location.hostname }}</span>
               </div>
               <div><span >{{ nowTime() }}</span></div>
             </el-footer>
@@ -127,7 +127,7 @@
               <div >
                 <span>via 越哥说电影合集</span>
                 <el-divider direction="vertical"></el-divider>
-                <span>yue.git66.com</span>
+                <span>{{ window.location.hostname }}</span>
               </div>
               <div><span >{{ nowTime() }}</span></div>
             </el-footer>
