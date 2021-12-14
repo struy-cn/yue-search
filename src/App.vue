@@ -143,7 +143,8 @@ export default {
 .darkmode .el-autocomplete,
 .darkmode input,
 .darkmode .el-input-group__append,
-.darkmode .el-autocomplete-suggestion{
+.darkmode .el-autocomplete-suggestion,
+.darkmode .movie-content>*{
   color: var(--dark-text-color) !important;
   background-color: var(--dark-bg-color) !important;
 }

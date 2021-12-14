@@ -89,20 +89,21 @@
             fit="cover"> 
           </el-image>
           <el-divider ></el-divider>
-          <div v-html="handerContentNoencode(randomMovie.contentNoencode)"></div>
+          <div :class="'movie-content'+(isDarkMode?' darkmode':'')" v-html="handerContentNoencode(randomMovie.contentNoencode)"></div>
           <br>
           <div v-if="innerVisible">
             <el-divider ></el-divider>
             <p>扫码观看当前解说(直达)</p>
             <p id="qrcode"></p>
-            <el-footer :class="'describe'+' share-footer'+(isDarkMode?' darkmode':'')">
-              <div>
+            <div>
+              <el-divider ></el-divider>
+              <div class="describe">
                 <span>via 越哥说电影合集</span>
                 <el-divider direction="vertical"></el-divider>
-                <span>{{ window.location.hostname }}</span>
+                <span>{{ hostname }}</span>
               </div>
-              <div><span >{{ nowTime() }}</span></div>
-            </el-footer>
+              <div class="describe" style="padding-bottom:10px;"><span >{{ nowtime }}</span></div>
+            </div>
           </div>
         </div>
       </div>
@@ -123,14 +124,15 @@
         <el-divider ></el-divider>
         <p v-for="row in currentCi.paragraphs" :key="row">{{row}}</p>
         <div v-if="innerVisible">
-            <el-footer :class="'describe'+' share-footer'+(isDarkMode?' darkmode':'')">
-              <div >
+            <div>
+              <el-divider ></el-divider>
+              <div class="describe">
                 <span>via 越哥说电影合集</span>
                 <el-divider direction="vertical"></el-divider>
-                <span>{{ window.location.hostname }}</span>
+                <span>{{ hostname }}</span>
               </div>
-              <div><span >{{ nowTime() }}</span></div>
-            </el-footer>
+              <div class="describe" style="padding-bottom:10px;"><span >{{ nowtime }}</span></div>
+            </div>
           </div>
       </div>
       <div v-if="isMuics">
@@ -248,6 +250,8 @@ export default {
       isPlacard:false,
       todayPlacard:null,
       isDarkMode:false,
+      nowtime: this.nowTime(),
+      hostname: this.hostName()
     }
   },
   mounted(){
@@ -327,7 +331,12 @@ export default {
       })
     },
     nowTime(){
-      return moment().format("YYYY-MM-DD HH:mm:ss")
+      this.nowtime = moment().format("YYYY-MM-DD HH:mm:ss")
+      return this.nowtime
+    },
+    hostName(){
+      this.hostname = window.location.hostname
+      return this.hostname
     },
     nowTimeDay(){
       return moment().format("YYYY-MM-DD")
@@ -444,6 +453,8 @@ export default {
     shareImg(selector,link){
       this.innerVisibleMsg = '图片生成中...'
       this.innerVisible = true
+      this.nowTime()
+      this.hostName()
       if(this.isDarkMode){
         document.querySelector(selector).classList.add('darkmode')
       }else{
