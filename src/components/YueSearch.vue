@@ -80,6 +80,7 @@
             <el-divider direction="vertical"></el-divider>
             <a target="_blank" :href="yLink">Youtube</a>
           </p>
+          <p class="describe" v-if="dialogTitle.includes('往年')">“{{ dialogTitle }}”</p>
           <p class="describe">发布时间：{{randomMovie.createTime}}</p>
           <el-divider ></el-divider>
           <p style="padding: 0 5px 0 5px;"><span>{{ randomMovie.pageTitle }}</span></p>
@@ -271,11 +272,6 @@ export default {
     }else{
       localStorage.setItem('accessNum', 1);
     }
-    this.$nextTick(() => {
-      if(!showAbout){
-        this.$refs.keywordInput.focus()
-      }
-    })
   },
   created(){
     console.log('created')
@@ -291,13 +287,6 @@ export default {
         if(this.datalen === this.htmls.length){
           this.htmls = this.htmls.sort((a, b) => b.title - a.title)
         }
-        console.log(this.htmls)
-        // axios.get('/wechat-page/'+element).then(resx => {
-        //    this.htmls.push({title:element.replace(".html",""),html:resx.data.replace(/<p><br\s\s\/><\/p>/g,'').replace(/<p><span style="font-size: \d\dpx;"><br\s\s\/><\/span><\/p>/g,'').replace(/<p style=""><br\s\s\/><\/p>/g,'')})
-        //    if(this.datalen === this.htmls.length){
-        //      this.htmls = this.htmls.sort((a, b) => b.title - a.title)
-        //    }
-        //  })
          axios.get('/db/'+element.replace(".html",".json")).then(resy => {
            const data = resy.data.map(x => {
               x.year = element.replace(".html","")
@@ -308,8 +297,17 @@ export default {
              }).sort((a,b) => b.oriCreateTime - a.oriCreateTime)
              setTimeout(() => {
               this.loading = false
-            },100)
+            },50)
            this.allMovies = this.allMovies.concat(data)
+           if(this.datalen === this.htmls.length){
+              let that = this
+              let range = that.year5BeforeRange()
+              let movies = that.allMovies.filter(x => {return range.includes(x.createTime)})
+              if (movies.length > 0){
+                that.dialogTitle = '往年今日解说'
+                that.openMovieDetail(-1,movies[0])
+              }
+          }
          })
       }
     })
@@ -340,6 +338,13 @@ export default {
     },
     nowTimeDay(){
       return moment().format("YYYY-MM-DD")
+    },
+    year5BeforeRange(){
+      let range = []
+      for (let index = 1; index < 5; index++) {
+        range.push(moment().subtract(index, 'years').format("YYYY-MM-DD")); 
+      }
+      return range
     },
     showMsg(msg){
       this.dialogVisible = true
