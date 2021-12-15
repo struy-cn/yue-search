@@ -305,7 +305,8 @@ export default {
               let movies = that.allMovies.filter(x => {return range.includes(x.createTime)})
               if (movies.length > 0){
                 that.dialogTitle = '往年今日解说'
-                that.openMovieDetail(-1,movies[0])
+                let index = Number(Math.floor(Math.random() * (movies.length)))
+                that.openMovieDetail(-1,movies[index])
               }
           }
          })
