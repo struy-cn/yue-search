@@ -209,7 +209,7 @@
       </div>
     </el-dialog>
     <el-divider ></el-divider>
-    <el-footer :style="isMobile?'margin-bottom: 40px;':''">© {{new Date().getFullYear()}} <a target="_blank" href="http://git66.com/soul">struy</a>｜<a target="_blank" href="https://github.com/StruggleYang/yue-search">源代码</a>｜本项目仅供学习使用，请勿用于商业用途！</el-footer>
+    <el-footer :style="isMobile?'margin-bottom: 40px;':''">© {{new Date().getFullYear()}} <a target="_blank" href="http://struy.cn/soul">struy</a>｜<a target="_blank" href="https://github.com/StruggleYang/yue-search">源代码</a>｜本项目仅供学习使用，请勿用于商业用途！</el-footer>
   </div>
 </template>
 
