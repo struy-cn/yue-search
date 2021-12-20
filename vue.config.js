@@ -1,6 +1,6 @@
 module.exports = {
     devServer: {
-        disableHostCheck: true,
-        publicPath: './'
-    }
+        disableHostCheck: true
+    },
+    publicPath: './'
 }
