@@ -68,7 +68,11 @@
         <p ><a target="_blank" :href="yLink">前往Youtube查看</a></p>
       </div>
       <div v-else-if="randomMovie !== null && currentCi === null">
-        <p>🎉找到一个超棒的解说，去看看吧<el-divider direction="vertical"></el-divider><a title="换一个" href="javascript:void(0)" @click="randomOpen"><i class="el-icon-refresh"></i>换一个</a></p>
+        <p>🎉找到一个超棒的解说，去看看吧<el-divider direction="vertical"></el-divider>
+          <a title="换一个" href="javascript:void(0)" @click="randomOpen"><i class="el-icon-refresh"></i>换一个</a>
+          <el-divider direction="vertical"></el-divider>
+          <a title="往年今日" href="javascript:void(0)" @click="todayOther"><i class="el-icon-refresh"></i>往年今日</a>  
+        </p>
         <p class="describe">点链接观看，如资源失效点击B站/西瓜/Yb查看</p>
         <div id="movie-body" >
           <br v-if="innerVisible">
@@ -275,7 +279,7 @@ export default {
   },
   created(){
     console.log('created')
-    axios.get('/db/data.json').then(res => {
+    axios.get('db/data.json').then(res => {
       if(res.data.length > 0){
           this.htmls = []
           this.datalen = res.data.length
@@ -287,7 +291,7 @@ export default {
         if(this.datalen === this.htmls.length){
           this.htmls = this.htmls.sort((a, b) => b.title - a.title)
         }
-         axios.get('/db/'+element.replace(".html",".json")).then(resy => {
+         axios.get('db/'+element.replace(".html",".json")).then(resy => {
            const data = resy.data.map(x => {
               x.year = element.replace(".html","")
               if(x.title !== x.text){
@@ -299,26 +303,26 @@ export default {
               this.loading = false
             },50)
            this.allMovies = this.allMovies.concat(data)
-           if(this.datalen === this.htmls.length){
-              let that = this
-              let range = that.year5BeforeRange()
-              let movies = that.allMovies.filter(x => {return range.includes(x.createTime)})
-              if (movies.length > 0){
-                that.dialogTitle = '往年今日解说'
-                let index = Number(Math.floor(Math.random() * (movies.length)))
-                that.openMovieDetail(-1,movies[index])
-              }
-          }
          })
       }
     })
     this.isMobile = this._isMobile()
-    axios.get('/db/songci300.json').then(res => {
+    axios.get('db/songci300.json').then(res => {
       this.songci = res.data
     })
     this.preLoadPlacrd()
   },
   methods:{
+    todayOther(){
+      let that = this
+      let range = that.year5BeforeRange()
+      let movies = that.allMovies.filter(x => {return range.includes(x.createTime)})
+      if (movies.length > 0){
+        that.dialogTitle = '往年今日解说'
+        let index = Number(Math.floor(Math.random() * (movies.length)))
+        that.openMovieDetail(-1,movies[index])
+      }
+    },
     darkModeChange(isDarkMode){
       this.isDarkMode = isDarkMode
       console.log(this.isDarkMode)
@@ -383,7 +387,7 @@ export default {
       }
     },
     genImgUrl(movie){
-      return '/cover/'+movie.coverLink
+      return 'cover/'+movie.coverLink
     },
     keywordInputSearch(queryString, cb){
       var results = queryString ? this.allMovies.filter(x => {
@@ -416,7 +420,7 @@ export default {
       this.dialogVisible = true
     },
     preLoadPlacrd(cb=()=>{}){
-      axios.get('/db/placard.json').then(res => {
+      axios.get('db/placard.json').then(res => {
         let url = localStorage.getItem('todayPlacardNum-'+this.nowTimeDay())
         if(url === null){
           const ran = Number(Math.floor(Math.random() * (res.data.length)))
