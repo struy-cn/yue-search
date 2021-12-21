@@ -70,8 +70,6 @@
       <div v-else-if="randomMovie !== null && currentCi === null">
         <p>🎉找到一个超棒的解说，去看看吧<el-divider direction="vertical"></el-divider>
           <a title="换一个" href="javascript:void(0)" @click="randomOpen"><i class="el-icon-refresh"></i>换一个</a>
-          <el-divider direction="vertical"></el-divider>
-          <a title="往年今日" href="javascript:void(0)" @click="todayOther"><i class="el-icon-refresh"></i>往年今日</a>  
         </p>
         <p class="describe">点链接观看，如资源失效点击B站/西瓜/Yb查看</p>
         <div id="movie-body" >
@@ -199,14 +197,14 @@
           <el-collapse-item title="交个朋友👬" name="2">
             <div style="text-align: center;">
               <p>我的个人微信，欢迎来撩，请备注: 越哥解说合集</p>
-              <el-image style="width: 180px; height: 180px" src="/qrcode/Wechat.jpeg" fit="cover"></el-image>
+              <el-image style="width: 180px; height: 180px" src="qrcode/Wechat.jpeg" fit="cover"></el-image>
             </div>
           </el-collapse-item>
           <el-collapse-item title="喜欢本站💖" name="3">
             <div style="text-align: center;">
               <p>不会真有人会赞赏我吧😂</p>
-              <el-image style="width: 180px; height: 180px" src="/qrcode/wechat-admire.jpeg" fit="cover"></el-image>
-              <el-image style="width: 180px; height: 180px" src="/qrcode/alipay.jpeg" fit="cover"></el-image>
+              <el-image style="width: 180px; height: 180px" src="qrcode/wechat-admire.jpeg" fit="cover"></el-image>
+              <el-image style="width: 180px; height: 180px" src="qrcode/alipay.jpeg" fit="cover"></el-image>
             </div>
           </el-collapse-item>
         </el-collapse>
@@ -279,6 +277,8 @@ export default {
   },
   created(){
     console.log('created')
+    let range = this.year5BeforeRange()
+    let todayOtherMovies = []
     axios.get('db/data.json').then(res => {
       if(res.data.length > 0){
           this.htmls = []
@@ -297,6 +297,12 @@ export default {
               if(x.title !== x.text){
                 x.title = x.text
               }
+              if(range.includes(x.createTime)){
+                todayOtherMovies.push(x)
+                 if(this.datalen === this.htmls.length){
+                   this.todayOther(todayOtherMovies)
+                 }
+              }
               return x
              }).sort((a,b) => b.oriCreateTime - a.oriCreateTime)
              setTimeout(() => {
@@ -310,17 +316,14 @@ export default {
     axios.get('db/songci300.json').then(res => {
       this.songci = res.data
     })
-    this.preLoadPlacrd()
+    //this.preLoadPlacrd()
   },
   methods:{
-    todayOther(){
-      let that = this
-      let range = that.year5BeforeRange()
-      let movies = that.allMovies.filter(x => {return range.includes(x.createTime)})
+    todayOther(movies){
       if (movies.length > 0){
-        that.dialogTitle = '往年今日解说'
+        this.dialogTitle = '往年今日解说'
         let index = Number(Math.floor(Math.random() * (movies.length)))
-        that.openMovieDetail(-1,movies[index])
+        this.openMovieDetail(-1,movies[index])
       }
     },
     darkModeChange(isDarkMode){
@@ -427,7 +430,7 @@ export default {
           url = res.data[ran]
           localStorage.setItem('todayPlacardNum-'+this.nowTimeDay(),url );
         }
-        const dom_img = document.createElement("img");
+        const dom_img = new Image();
         dom_img.src = url
         this.todayPlacard = url
         cb()
@@ -478,7 +481,7 @@ export default {
         that.$nextTick(() => {
           html2canvas(document.querySelector(selector),{cale: 6}).then(function(canvas) {
               that.innerVisibleMsg = '图片生成成功！可长按或右键保存图片'
-              const dom_img = document.createElement("img");
+              const dom_img = new Image();
               dom_img.src = canvas.toDataURL("image/jpeg")
               dom_img.classList.add('el-image__inner')
               dom_img.style = 'object-fit: cover;'
