@@ -52,7 +52,9 @@ for file in files:
                 # 可能有其他字符
                 text = re.sub(domPattern, '', link[2])
                 title = link[1]
-                number = int(title.split("、")[0])
+                number = 0
+                if('、' in title):
+                    number = int(title.split("、")[0])
                 href = link[0]
                 exist = list(filter(lambda x: x.get('title') ==
                                     title and x.get('href') == href, curr_year_list))
