@@ -5,8 +5,8 @@
     :fullscreen="true" :body="true">
     <h1 :style="isMobile?'margin-top: 60px;':''">{{ title }}</h1>
     <p>越哥说电影，专注好电影！</p>
-    <p>
-     (来源:微信公众号)
+    <p class="describe">
+     (来源:微信公众号)，总计收录{{ allMovies.length }}个解说
     </p>
     <p>
       <a title="试试手气" href="javascript:void(0)" @click="randomOpen"><i class="el-icon-present">影</i></a>
@@ -21,7 +21,7 @@
     </p>
     <el-divider v-if="isMobile" ></el-divider>
     <div :class="isMobile?'search-input-mobile':'search-input'">
-    <el-autocomplete :fetch-suggestions="keywordInputSearch" @select="searchDoms" ref="keywordInput"  placeholder="输入电影名" v-model="searchKeyword" class="input-with-select">
+    <el-autocomplete :fetch-suggestions="keywordInputSearch" @select="searchDoms" @keyup.enter.native="searchDoms" ref="keywordInput"  placeholder="输入电影名、发布时间、解说标题" v-model="searchKeyword" class="input-with-select">
       <el-select v-if="!isMobile" disabled v-model="select" slot="prepend" placeholder="请选择" style="width:100px;">
         <el-option label="公众号" :value="1" ></el-option>
         <el-option disabled label="B站" :value="2"></el-option>
@@ -35,14 +35,15 @@
       <el-button slot="append" icon="el-icon-search" @click="searchDoms"></el-button>
     </el-autocomplete>
   </div>
-    <el-row v-if="datalen===htmls.length">
+    <!-- <el-row v-if="datalen===htmls.length">
       <el-col v-for="(item,index) in htmls" :key="index" :xs="24" :sm="6" :md="6" :lg="6" :xl="6"><p>{{item.title}}年解说合集<i class="el-icon-bottom"></i></p>
         <div class="grid-content bg-purple-dark" >
           <p v-for="(movie) in allMovies.filter(x => x.year === item.title)" :key="movie.title"><a target="_blank" style="cursor: pointer;" @click="openMovieDetail(-1,movie)" :title="movie.title.replace(/\d{1,3}、/,'')+'-'+movie.createTime" :textvalue="movie.title.replace(/\d{1,3}、/,'')">{{movie.title.replace(/\d{1,3}、/,'')}}</a></p>
         </div>
       </el-col>
-    </el-row>
-    <el-dialog
+    </el-row> -->
+    <div
+      :style="`width: ${isMobile?'90%':'50%'};margin:0 auto;`"
       top="20px"
       :visible="dialogVisible"
       :destroy-on-close="true"
@@ -68,22 +69,24 @@
         <p ><a target="_blank" :href="yLink">前往Youtube查看</a></p>
       </div>
       <div v-else-if="randomMovie !== null && currentCi === null">
-        <p>🎉找到一个超棒的解说，去看看吧<el-divider direction="vertical"></el-divider>
-          <a title="换一个" href="javascript:void(0)" @click="randomOpen"><i class="el-icon-refresh"></i>换一个</a>
-        </p>
-        <p class="describe">点链接观看，如资源失效点击B站/西瓜/Yb查看</p>
+        <!-- <p>🎉找到一个超棒的解说，去看看吧<el-divider direction="vertical"></el-divider>
+          
+        </p> -->
         <div id="movie-body" >
           <br v-if="innerVisible">
           <p><a :href="randomMovie.href">{{ randomMovie.title.replace(/\d{1,3}、/,'') }}</a></p>
+          <p class="describe">发布时间：{{randomMovie.createTime}}</p>
           <p v-if="!innerVisible">
             <a target="_blank" :href="bLink">B站</a>
             <el-divider direction="vertical"></el-divider>
             <a target="_blank" :href="xLink">西瓜</a>
             <el-divider direction="vertical"></el-divider>
-            <a target="_blank" :href="yLink">Youtube</a>
+            <a target="_blank" :href="yLink">YouTube</a>
+            <el-divider direction="vertical"></el-divider>
+            <a title="换一个" href="javascript:void(0)" @click="randomOpen"><i class="el-icon-refresh"></i>换一个电影</a>
           </p>
           <p class="describe" v-if="dialogTitle.includes('往年')">“{{ dialogTitle }}”</p>
-          <p class="describe">发布时间：{{randomMovie.createTime}}</p>
+          <p class="describe" v-if="!innerVisible">点电影标题观影，如资源失效点击B站/西瓜/Yb查看</p>
           <el-divider ></el-divider>
           <p style="padding: 0 5px 0 5px;"><span>{{ randomMovie.pageTitle }}</span></p>
           <blockquote>{{ randomMovie.desc }}</blockquote>
@@ -91,7 +94,7 @@
             :src="genImgUrl(randomMovie)"
             fit="cover"> 
           </el-image>
-          <el-divider ></el-divider>
+          <!-- <el-divider ></el-divider> -->
           <div :class="'movie-content'+(isDarkMode?' darkmode':'')" v-html="handerContentNoencode(randomMovie.contentNoencode)"></div>
           <br>
           <div v-if="innerVisible">
@@ -168,7 +171,7 @@
           <div id="inner-body-img-box" style="box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)">
           </div>
         </el-dialog>
-    </el-dialog>
+      </div>
     <el-dialog 
       top="15px"
       :visible="dialogVisibleAbout"
@@ -236,7 +239,7 @@ export default {
       searchKeyword:'',
       dialogMsg:"",
       dialogVisible:false,
-      dialogTitle:'提示',
+      dialogTitle:'',
       bLink: '',
       xLink:'',
       yLink:'',
@@ -258,22 +261,22 @@ export default {
     }
   },
   mounted(){
-    const showAboutNum = [200]
-    console.log('mounted')
-    const accessNum = localStorage.getItem('accessNum')
-    let showAbout = false
-    if(accessNum!==null&&!isNaN(accessNum)){
-      let currNum = Number(accessNum) + 1
-      showAbout = showAboutNum.includes(currNum)
-      if(showAbout){
-         this.$nextTick(() => {
-            this.about()
-         })
-      }
-      localStorage.setItem('accessNum',currNum );
-    }else{
-      localStorage.setItem('accessNum', 1);
-    }
+    // const showAboutNum = [200]
+    // console.log('mounted')
+    // const accessNum = localStorage.getItem('accessNum')
+    // let showAbout = false
+    // if(accessNum!==null&&!isNaN(accessNum)){
+    //   let currNum = Number(accessNum) + 1
+    //   showAbout = showAboutNum.includes(currNum)
+    //   if(showAbout){
+    //      this.$nextTick(() => {
+    //         this.about()
+    //      })
+    //   }
+    //   localStorage.setItem('accessNum',currNum );
+    // }else{
+    //   localStorage.setItem('accessNum', 1);
+    // }
   },
   created(){
     console.log('created')
@@ -309,6 +312,9 @@ export default {
               this.loading = false
             },50)
            this.allMovies = this.allMovies.concat(data)
+           if(this.datalen === this.htmls.length&&this.dialogTitle !== '往年今日解说'){
+            this.randomOpen()
+          }
          })
       }
     })
@@ -368,7 +374,7 @@ export default {
       this.randomMovie = null
       this.currentCi = null
       this.dialogMsg = ""
-      this.dialogTitle = '提示'
+      this.dialogTitle = ''
       this.isMuics = false
       this.isPlacard = false
     },
@@ -381,7 +387,8 @@ export default {
     about(){
       this.dialogVisibleAbout = true
     },
-    placard(){
+    placard() {
+      this.handleClosed()
       this.isPlacard = true
       this.dialogVisible = true
       this.dialogTitle = '今日属于您的海报'
@@ -394,7 +401,7 @@ export default {
     },
     keywordInputSearch(queryString, cb){
       var results = queryString ? this.allMovies.filter(x => {
-          return x.title.includes(queryString)|x.text.includes(queryString)|x.pageTitle.includes(queryString)
+          return x.title.includes(queryString)|x.text.includes(queryString)|x.pageTitle.includes(queryString)|x.createTime.includes(queryString)
         }).map(x =>  {
           return {"value":x.title.replace(/\d{1,3}、/,''),'createTime':x.createTime,'pageTitle':x.pageTitle}}) 
           : this.allMovies.map(x => {return {"value":x.title.replace(/\d{1,3}、/,''),'createTime':x.createTime,'pageTitle':x.pageTitle}});
@@ -403,7 +410,7 @@ export default {
 
     },
     handerContentNoencode(html){
-      return html.replace(/<section.*?section>/g,'')
+      return html
       .replace(/<iframe.*?iframe>/g,'')
       .replace(/<img.*?>/g,'')
       .replace(/<p.*?>.*?[高|备].*[清|用].*播.*放.*[地|视].*[址|频].*?<\/p>/,'')
@@ -436,19 +443,22 @@ export default {
         cb()
       })
     },
-    randomOpen(){
+    randomOpen() {
+      this.handleClosed()
       //const movies = document.querySelectorAll('.grid-content  a')
       const num = Number(Math.floor(Math.random() * (this.allMovies.length)))
       this.dialogTitle = '手气不错'
       this.openMovieDetail(num)
     },
-    songCi(){
+    songCi() {
+      this.handleClosed()
       const num = Math.floor(Math.random() * (this.songci.length))
       this.currentCi = this.songci[num]
       this.dialogTitle = '《'+this.currentCi.rhythmic+'》'
       this.dialogVisible = true
     },
-    music(){
+    music() {
+      this.handleClosed()
        this.isMuics = true
        this.dialogTitle = '来首音乐'
        this.dialogVisible = true
@@ -495,8 +505,9 @@ export default {
       this.xLink = 'https://www.ixigua.com/search/越哥说电影'+movieName
       this.yLink = 'https://www.youtube.com/channel/UChgCVolsF6L7DWmOpWKSkMA/search?query='+movieName
     },
-    searchDoms(){
-      let doms = document.querySelectorAll('a[textvalue*="'+this.searchKeyword+'"]')
+    searchDoms() {
+      this.handleClosed()
+      //let doms = document.querySelectorAll('a[textvalue*="'+this.searchKeyword+'"]')
       const movie = this.allMovies.filter((x) => x.title.includes(this.searchKeyword))
       this.genOtherLink(this.searchKeyword)
       if(movie.length === 0){
@@ -505,10 +516,10 @@ export default {
         this.dialogTitle = '找到了一个解说'
         this.openMovieDetail(-1,movie[0])
       }
-      doms.forEach(x => {
-        x.classList.add('search')
-        x.scrollIntoView({block: "center"})
-      })
+      // doms.forEach(x => {
+      //   x.classList.add('search')
+      //   x.scrollIntoView({block: "center"})
+      // })
     }
   }
 }
