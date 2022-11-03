@@ -300,7 +300,7 @@ export default {
               if(x.title !== x.text){
                 x.title = x.text
               }
-              if(range.includes(x.createTime)){
+              if(range.includes(x.createTime.substr(0,10))){
                 todayOtherMovies.push(x)
                  if(this.datalen === this.htmls.length){
                    this.todayOther(todayOtherMovies)
