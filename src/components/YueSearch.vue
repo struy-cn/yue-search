@@ -182,7 +182,7 @@
       @close="handleCloseAbout"
       @closed="handleClosedAbout">
       <div style="text-align: left;">
-        <p>作者：<a target="_blank" href="https://github.com/StruggleYang">StruggleYang</a></p>
+        <p>作者：<a target="_blank" href="https://struy.cn/about/">@StruggleYang</a></p>
         <p>邮箱： <a type="email" target="_blank" href="mailto:yq1724555319@gmail.com">yq1724555319@gmail.com</a></p>
         <p>关于：项目源于作者兴趣进行开发和维护，托管于GitHub，数据来源于“越哥说电影”微信公众号>解说合集，本站不做数据存储，只做数据索引(链接到越哥各平台主页/解说页，不直接展示视频)</p>
         <el-collapse>
@@ -199,7 +199,7 @@
           </el-collapse-item>
           <el-collapse-item title="交个朋友👬" name="2">
             <div style="text-align: center;">
-              <p>我的个人微信，欢迎来撩，请备注: 越哥解说合集</p>
+              <p>作者个人微信(注意我不是越哥，但可以拉你进入越哥粉丝交流群)，请备注: 越哥解说合集</p>
               <el-image style="width: 180px; height: 180px" src="qrcode/Wechat.jpeg" fit="cover"></el-image>
             </div>
           </el-collapse-item>
@@ -214,7 +214,7 @@
       </div>
     </el-dialog>
     <el-divider ></el-divider>
-    <el-footer :style="isMobile?'margin-bottom: 40px;':''">© {{new Date().getFullYear()}} <a target="_blank" href="http://struy.cn/soul">struy</a>｜<a target="_blank" href="https://github.com/StruggleYang/yue-search">源代码</a>｜本项目仅供学习使用，请勿用于商业用途！</el-footer>
+    <el-footer :style="isMobile?'margin-bottom: 40px;':''">© {{new Date().getFullYear()}} <a target="_blank" href="https://struy.cn/about/">@StruggleYang</a>｜<a target="_blank" href="https://github.com/struy-cn/yue-search">源代码</a>｜本项目仅供学习，勿用于商业用途！</el-footer>
   </div>
 </template>
 
